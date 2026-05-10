@@ -1,0 +1,9 @@
+Dashboard:
+  Serverlist:
+    BeforeContent: HeroBanner
+Navigation:
+  NavigationBar:
+    BeforeNavigation: Sidebar
+Server:
+  Terminal:
+    BeforeContent: ServerInfoBar

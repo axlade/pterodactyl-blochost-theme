@@ -1,0 +1,76 @@
+.button {
+    @apply px-4 py-2 inline-flex items-center justify-center;
+    @apply rounded text-base font-semibold transition-all duration-100;
+    @apply focus:ring-[3px] focus:ring-offset-2 focus:ring-offset-gray-700 focus:ring-opacity-50;
+
+    /* Sizing Controls */
+    &.small {
+        @apply px-4 py-0 h-8 font-normal text-sm focus:ring-2;
+    }
+
+    &.large {
+        @apply px-5 py-3;
+    }
+
+    &.secondary {
+        @apply text-gray-50 bg-transparent;
+
+        &:disabled {
+            background: transparent !important;
+        }
+    }
+
+    &:disabled {
+        @apply cursor-not-allowed;
+    }
+
+    &.square {
+        @apply p-0 w-12 h-12;
+
+        &.small {
+            @apply w-8 h-8;
+        }
+    }
+}
+
+.primary {
+    background: #FF7D20;
+    color: #fff;
+
+    &:hover, &:active { background: rgba(255, 125, 32, 0.85); }
+    &:focus { --tw-ring-color: rgba(255, 125, 32, 0.4); }
+
+    &.secondary {
+        &:hover, &:active { background: rgba(255, 125, 32, 0.15); }
+    }
+
+    &:disabled { background: rgba(255, 125, 32, 0.4); color: rgba(255,255,255,0.5); }
+}
+
+.text {
+    background: #252525;
+    color: #c0c0c0;
+    border: 1px solid rgba(255,255,255,0.08);
+
+    &:hover, &:active { background: #2e2e2e; color: #e0e0e0; }
+    &:focus { --tw-ring-color: rgba(255,255,255,0.15); }
+
+    &.secondary {
+        &:hover, &:active { background: #252525; }
+    }
+
+    &:disabled { background: rgba(37,37,37,0.5); color: rgba(192,192,192,0.4); }
+}
+
+.danger {
+    @apply bg-red-600 text-gray-50;
+    @apply hover:bg-red-500 active:bg-red-500 focus:ring-red-400 focus:ring-opacity-75;
+
+    &.secondary {
+        @apply hover:bg-red-600 active:bg-red-600;
+    }
+
+    &:disabled {
+        @apply bg-red-600/75 text-red-50/75;
+    }
+}

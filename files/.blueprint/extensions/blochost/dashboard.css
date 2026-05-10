@@ -1,0 +1,304 @@
+/* ============================================================
+   BLOCHOST THEME — Dark / Orange
+   Toutes les modifications sont dans cette extension uniquement.
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap');
+
+/* ── Variables ──────────────────────────────────────────────── */
+:root {
+    --bh-orange:      #FF7D20;
+    --bh-bg:          #111111;
+    --bh-surface:     #191919;
+    --bh-border:      rgba(255, 255, 255, 0.07);
+    --bh-text:        #d0d0d0;
+    --bh-muted:       rgba(255, 255, 255, 0.3);
+    --bh-sidebar-w:   220px;
+    --bh-radius:      14px;
+}
+
+/* ── Font globale ───────────────────────────────────────────── */
+html, body, #app,
+input, button, select, textarea,
+p, span, div, a, h1, h2, h3, h4, h5, li {
+    font-family: 'Sora', sans-serif;
+}
+
+/* Conserver la police mono dans le terminal */
+.xterm, .xterm *, #terminal, #terminal * {
+    font-family: 'Courier New', Courier, monospace !important;
+}
+
+/* ── Background global ──────────────────────────────────────── */
+html, body { background-color: var(--bh-bg) !important; }
+#app { background-color: var(--bh-bg) !important; min-height: 100vh; }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   SIDEBAR — remplace la navbar horizontale
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Réduire la navbar à zéro sans la masquer (sinon la Sidebar fixed disparaît aussi) */
+#NavigationBar {
+    height: 0 !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+/* Cacher le contenu natif de la navbar (logo, liens) mais PAS notre sidebar */
+#NavigationBar > .mx-auto { display: none !important; }
+#NavigationBar > div:not(#bh-sidebar) > * { display: none !important; }
+
+/* Cacher la sous-navigation horizontale (onglets serveur) */
+#SubNavigation { display: none !important; }
+
+/* Décaler tout le contenu sous la sidebar */
+#app > div {
+    padding-left: var(--bh-sidebar-w) !important;
+}
+
+/* Hover des liens de navigation */
+.bh-nav-item:hover {
+    background: rgba(255, 125, 32, 0.1) !important;
+    color: #FF7D20 !important;
+}
+
+/* Bouton déconnexion */
+.bh-logout-btn:hover { color: var(--bh-orange) !important; }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   CACHER LES ÉLÉMENTS PTERODACTYL REMPLACÉS
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Titre + boutons power originaux (remplacés par ServerInfoBar) */
+.grid.grid-cols-4.gap-4.mb-4 { display: none !important; }
+
+/* ═══════════════════════════════════════════════════════════════
+   CONSOLE PANEL — Styling du terminal intégré
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Supprimer le border-radius du haut du terminal (le header custom le gère) */
+[class*="container_"] {
+    background: #111111 !important;
+    border-radius: 0 0 10px 10px !important;
+    border-top: none !important;
+}
+
+/* Input de commande — style BLOCHOST */
+[class*="command_input"] {
+    background: #0d0d0d !important;
+    border-top: 1px solid rgba(255,255,255,0.06) !important;
+    border-radius: 0 0 10px 10px !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-bottom: none !important;
+    color: #d0d0d0 !important;
+}
+
+[class*="command_input"]:focus, [class*="command_input"]:active {
+    border-color: rgba(255,125,32,0.3) !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* Supprimer le focus ring bleu du navigateur sur le canvas xterm */
+.xterm:focus, .xterm-viewport:focus, .xterm-screen:focus,
+.xterm canvas, .xterm canvas:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+[class*="command_icon"] {
+    color: rgba(255,125,32,0.45) !important;
+}
+
+/* Override chart container (géré par ChartBlock JSX maintenant) */
+[class*="chart_container"] {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   CARTES SERVEUR (liste dashboard)
+   ═══════════════════════════════════════════════════════════════ */
+a[href*="/server/"][class]:not(.bh-nav-item):not([href*="/files"]):not([href*="/edit"]) {
+    background: var(--bh-surface) !important;
+    border: 1px solid var(--bh-border) !important;
+    border-radius: var(--bh-radius) !important;
+    box-shadow: none !important;
+    transition: border-color 0.2s, transform 0.18s !important;
+    text-decoration: none !important;
+    color: var(--bh-text) !important;
+}
+
+a[href*="/server/"][class]:not(.bh-nav-item):not([href*="/files"]):not([href*="/edit"]):hover {
+    border-color: rgba(255, 125, 32, 0.4) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Reset explicite pour les liens de navigation sidebar */
+a.bh-nav-item {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   PANNEAUX / CARTES GÉNÉRIQUES
+   ═══════════════════════════════════════════════════════════════ */
+.rounded.shadow-md, .rounded.shadow,
+[class*="shadow-md"], [class*="rounded-xl"] {
+    background: var(--bh-surface) !important;
+    border: 1px solid var(--bh-border) !important;
+    border-radius: var(--bh-radius) !important;
+    box-shadow: none !important;
+}
+
+/* En-tête des panneaux */
+.rounded.shadow-md > div:first-child,
+.rounded.shadow > div:first-child {
+    background: rgba(255, 255, 255, 0.02) !important;
+    border-bottom: 1px solid var(--bh-border) !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   INPUTS
+   ═══════════════════════════════════════════════════════════════ */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+select, textarea {
+    background: #141414 !important;
+    border: 1px solid #282828 !important;
+    border-radius: 10px !important;
+    color: #d4d4d4 !important;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):focus,
+select:focus, textarea:focus {
+    border-color: rgba(255, 125, 32, 0.45) !important;
+    box-shadow: 0 0 0 3px rgba(255, 125, 32, 0.08) !important;
+    outline: none !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   BOUTONS SUBMIT
+   ═══════════════════════════════════════════════════════════════ */
+button[type="submit"] {
+    background: var(--bh-orange) !important;
+    border: none !important;
+    border-radius: 10px !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+}
+
+button[type="submit"]:hover { opacity: 0.88 !important; }
+
+button[type="submit"]:disabled {
+    opacity: 0.4 !important;
+    cursor: not-allowed !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   TOGGLE / SWITCH
+   ═══════════════════════════════════════════════════════════════ */
+button[role="switch"][aria-checked="true"] > span {
+    background-color: var(--bh-orange) !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   SCROLLBAR
+   ═══════════════════════════════════════════════════════════════ */
+::-webkit-scrollbar       { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--bh-orange); }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   TEXTES TAILWIND — remapper les couleurs du thème
+   ═══════════════════════════════════════════════════════════════ */
+.text-gray-100, .text-neutral-100 { color: #e8e8e8 !important; }
+.text-gray-200, .text-neutral-200 { color: #c0c0c0 !important; }
+.text-gray-300, .text-neutral-300 { color: #999 !important; }
+.text-gray-400, .text-neutral-400 { color: #666 !important; }
+.text-gray-500, .text-neutral-500 { color: #444 !important; }
+.text-cyan-400 { color: var(--bh-orange) !important; }
+.text-cyan-200 { color: #ffb87a !important; }
+
+/* ═══════════════════════════════════════════════════════════════
+   BACKGROUNDS TAILWIND
+   ═══════════════════════════════════════════════════════════════ */
+.bg-gray-700, .bg-neutral-700 { background-color: var(--bh-surface) !important; }
+.bg-gray-800, .bg-neutral-800 { background-color: #141414 !important; }
+.bg-gray-900, .bg-neutral-900 { background-color: var(--bh-bg) !important; }
+
+/* ═══════════════════════════════════════════════════════════════
+   GESTIONNAIRE DE FICHIERS
+   ═══════════════════════════════════════════════════════════════ */
+
+
+/* Breadcrumb bar — fond panel */
+.flex.flex-wrap-reverse,
+.flex.flex-wrap-reverse.md\:flex-nowrap {
+    background: #191919 !important;
+    border: 1px solid rgba(255,255,255,0.06) !important;
+    border-radius: 12px !important;
+    padding: 0.55rem 0.75rem !important;
+    margin-bottom: 0.5rem !important;
+    align-items: center !important;
+}
+
+/* Séparateur "/" dans le breadcrumb */
+.flex.flex-wrap-reverse.md\:flex-nowrap > * { color: #555 !important; }
+
+/* Zone "This directory seems to be empty" */
+p.text-sm.text-neutral-400.text-center {
+    background: #191919 !important;
+    border: 1px solid rgba(255,255,255,0.06) !important;
+    border-radius: 10px !important;
+    padding: 2rem !important;
+    color: #555 !important;
+}
+
+/* Barre d'actions masse (Move / Archive / Delete) */
+div[class*="bg-black\/50"] {
+    background: rgba(25,25,25,0.95) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    border-radius: 14px !important;
+    backdrop-filter: blur(8px) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ÉDITEUR CODEMIRROR
+   ═══════════════════════════════════════════════════════════════ */
+.cm-s-ayu-mirage.CodeMirror {
+    background: #191919 !important;
+    color: #d0d0d0 !important;
+    border-radius: 10px !important;
+}
+.cm-s-ayu-mirage .CodeMirror-gutters {
+    background: #141414 !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border-radius: 10px 0 0 10px !important;
+}
+.cm-s-ayu-mirage .CodeMirror-linenumber { color: #3a3a3a !important; }
+.cm-s-ayu-mirage div.CodeMirror-selected { background: rgba(255, 125, 32, 0.18) !important; }
+.cm-s-ayu-mirage .CodeMirror-cursor { border-left-color: #FF7D20 !important; }
+.cm-s-ayu-mirage .CodeMirror-activeline-background { background: rgba(255,255,255,0.025) !important; }
+
+/* ═══════════════════════════════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════════════════════════════ */
+#app p.text-center { color: #2a2a2a !important; }
+#app p.text-center a { color: #2a2a2a !important; text-decoration: none !important; }
