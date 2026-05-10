@@ -75,6 +75,7 @@ FILES=(
 
 TOTAL=${#FILES[@]}
 COUNT=0
+ERRORS=0
 
 for FILE in "${FILES[@]}"; do
     COUNT=$((COUNT + 1))
@@ -85,8 +86,15 @@ for FILE in "${FILES[@]}"; do
         echo -e "  ${GREEN}✓${RESET} [$COUNT/$TOTAL] $FILE"
     else
         echo -e "  ${RED}✗${RESET} [$COUNT/$TOTAL] Échec : $FILE"
+        ERRORS=$((ERRORS + 1))
     fi
 done
+
+if [ "$ERRORS" -gt 0 ]; then
+    echo ""
+    echo -e "${RED}✗ $ERRORS fichier(s) ont échoué. Vérifie les erreurs ci-dessus.${RESET}"
+    exit 1
+fi
 
 echo ""
 echo -e "${ORANGE}→${RESET} Compilation du frontend..."
