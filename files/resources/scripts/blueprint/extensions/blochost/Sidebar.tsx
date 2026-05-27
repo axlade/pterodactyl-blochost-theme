@@ -11,21 +11,42 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import http from '@/api/http';
 
-/* ── Styles partagés ─────────────────────────────────────────── */
 const F = "'Sora', sans-serif";
 
 const base: React.CSSProperties = {
     display: 'flex', alignItems: 'center', gap: '0.6rem',
     padding: '0.45rem 0.65rem', borderRadius: '10px',
     fontSize: '0.81rem', fontWeight: 500,
-    textDecoration: 'none', color: '#7a7a7a',
+    textDecoration: 'none',
     background: 'transparent', cursor: 'pointer',
     border: 'none', width: '100%', textAlign: 'left',
-    transition: 'background 0.15s, color 0.15s',
     boxSizing: 'border-box', fontFamily: F,
+    position: 'relative', zIndex: 1,
+    transition: 'color 0.18s',
 };
-const activeStyle: React.CSSProperties = {
-    color: '#FF7D20', background: 'rgba(255,125,32,0.1)', fontWeight: 600,
+
+/* ── Wrapper avec animation orange clip-path ─────────────────── */
+const OrangeWrap = ({ children, extraStyle }: {
+    children: (hov: boolean) => React.ReactNode;
+    extraStyle?: React.CSSProperties;
+}) => {
+    const [hov, setHov] = useState(false);
+    return (
+        <div
+            style={{ position: 'relative', overflow: 'hidden', borderRadius: '10px', ...extraStyle }}
+            onMouseEnter={() => setHov(true)}
+            onMouseLeave={() => setHov(false)}
+        >
+            {/* Couche orange — cercle qui s'étend */}
+            <div style={{
+                position: 'absolute', inset: 0, pointerEvents: 'none',
+                background: '#FF7D20',
+                clipPath: hov ? 'circle(150% at 8% 50%)' : 'circle(0% at 8% 50%)',
+                transition: 'clip-path 0.55s cubic-bezier(0.4, 0, 0.2, 1)',
+            }} />
+            {children(hov)}
+        </div>
+    );
 };
 
 /* ── Composant section déroulante ───────────────────────────── */
@@ -39,10 +60,10 @@ const Section = ({ title, defaultOpen = true, children }: SectionProps) => {
                 width: '100%', background: 'none', border: 'none', cursor: 'pointer',
                 padding: '0.4rem 0.5rem', borderRadius: '8px', fontFamily: F,
             }}>
-                <span style={{ fontSize: '0.58rem', fontWeight: 700, color: '#555', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                <span style={{ fontSize: '0.58rem', fontWeight: 700, color: '#282828', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
                     {title}
                 </span>
-                <FontAwesomeIcon icon={open ? faChevronDown : faChevronRight} style={{ fontSize: '0.55rem', color: '#555' }} />
+                <FontAwesomeIcon icon={open ? faChevronDown : faChevronRight} style={{ fontSize: '0.55rem', color: '#2a2a2a' }} />
             </button>
             {open && <div style={{ paddingLeft: '0.15rem' }}>{children}</div>}
         </div>
@@ -54,7 +75,7 @@ const serverGroups = [
     {
         label: 'Accès',
         items: [
-            { sub: '',       label: 'Console',  icon: faTerminal, exact: true },
+            { sub: '',       label: 'Console',  icon: faTerminal, exact: true  },
             { sub: '/files', label: 'Fichiers', icon: faFolder,   exact: false },
         ],
     },
@@ -69,11 +90,11 @@ const serverGroups = [
     {
         label: 'Serveur',
         items: [
-            { sub: '/users',    label: 'Utilisateurs', icon: faUsers,       exact: false },
-            { sub: '/network',  label: 'Réseau',        icon: faNetworkWired,exact: false },
-            { sub: '/startup',  label: 'Démarrage',     icon: faRocket,      exact: false },
-            { sub: '/settings', label: 'Paramètres',    icon: faCogs,        exact: false },
-            { sub: '/activity', label: 'Activité',      icon: faList,        exact: false },
+            { sub: '/users',    label: 'Utilisateurs', icon: faUsers,        exact: false },
+            { sub: '/network',  label: 'Réseau',        icon: faNetworkWired, exact: false },
+            { sub: '/startup',  label: 'Démarrage',     icon: faRocket,       exact: false },
+            { sub: '/settings', label: 'Paramètres',    icon: faCogs,         exact: false },
+            { sub: '/activity', label: 'Activité',      icon: faList,         exact: false },
         ],
     },
 ];
@@ -110,7 +131,7 @@ export default () => {
                         {panelName}
                     </div>
                 </Link>
-                <div style={{ fontSize: '0.62rem', color: '#555', marginTop: '0.18rem', fontWeight: 500, fontFamily: F }}>
+                <div style={{ fontSize: '0.62rem', color: '#222', marginTop: '0.18rem', fontWeight: 500, fontFamily: F }}>
                     Panel de gestion
                 </div>
             </div>
@@ -119,58 +140,85 @@ export default () => {
             <nav style={{ flex: 1, padding: '0.3rem 0.5rem', overflowY: 'auto', overflowX: 'hidden' }}>
 
                 {serverId ? (
-                    /* ═══ PAGE SERVEUR ═══ */
                     <>
-                        <Link to='/' style={{ ...base, marginTop: '0.3rem', marginBottom: '0.2rem', fontSize: '0.75rem' }} className='bh-nav-item'>
-                            <FontAwesomeIcon icon={faChevronLeft} style={{ fontSize: '0.68rem' }} />
-                            Tableau de bord
-                        </Link>
+                        {/* Bouton retour */}
+                        <OrangeWrap extraStyle={{ marginTop: '0.3rem', marginBottom: '0.2rem' }}>
+                            {(hov) => (
+                                <Link to='/' className='bh-nav-item' style={{ ...base, color: hov ? '#fff' : '#333', fontSize: '0.75rem' }}>
+                                    <FontAwesomeIcon icon={faChevronLeft} style={{ fontSize: '0.68rem' }} />
+                                    Tableau de bord
+                                </Link>
+                            )}
+                        </OrangeWrap>
 
                         {serverGroups.map(group => (
                             <Section key={group.label} title={group.label}>
                                 {group.items.map(item => (
-                                    <NavLink key={item.sub} exact={item.exact}
-                                        to={`/server/${serverId}${item.sub}`}
-                                        style={base} activeStyle={activeStyle} className='bh-nav-item'>
-                                        <FontAwesomeIcon icon={item.icon} fixedWidth style={{ fontSize: '0.79rem' }} />
-                                        {item.label}
-                                    </NavLink>
+                                    <OrangeWrap key={item.sub}>
+                                        {(hov) => (
+                                            <NavLink
+                                                exact={item.exact}
+                                                to={`/server/${serverId}${item.sub}`}
+                                                className='bh-nav-item'
+                                                style={{ ...base, color: hov ? '#fff' : '#484848' }}
+                                                activeStyle={{ color: hov ? '#fff' : '#FF7D20', fontWeight: 600, background: 'transparent' }}
+                                            >
+                                                <FontAwesomeIcon icon={item.icon} fixedWidth style={{ fontSize: '0.79rem' }} />
+                                                {item.label}
+                                            </NavLink>
+                                        )}
+                                    </OrangeWrap>
                                 ))}
                             </Section>
                         ))}
                     </>
                 ) : (
-                    /* ═══ DASHBOARD ═══ */
                     <Section title='Menu'>
-                        <NavLink exact to='/' style={base} activeStyle={activeStyle} className='bh-nav-item'>
-                            <FontAwesomeIcon icon={faLayerGroup} fixedWidth style={{ fontSize: '0.79rem' }} />
-                            Tableau de bord
-                        </NavLink>
+                        <OrangeWrap>
+                            {(hov) => (
+                                <NavLink exact to='/' className='bh-nav-item'
+                                    style={{ ...base, color: hov ? '#fff' : '#484848' }}
+                                    activeStyle={{ color: hov ? '#fff' : '#FF7D20', fontWeight: 600, background: 'transparent' }}
+                                >
+                                    <FontAwesomeIcon icon={faLayerGroup} fixedWidth style={{ fontSize: '0.79rem' }} />
+                                    Tableau de bord
+                                </NavLink>
+                            )}
+                        </OrangeWrap>
                     </Section>
                 )}
 
-                {/* ═══ COMPTE (toujours visible) ═══ */}
+                {/* ═══ COMPTE ═══ */}
                 <Section title='Compte' defaultOpen={!serverId}>
-                    <NavLink exact to='/account' style={base} activeStyle={activeStyle} className='bh-nav-item'>
-                        <FontAwesomeIcon icon={faUser} fixedWidth style={{ fontSize: '0.79rem' }} />
-                        Mon profil
-                    </NavLink>
-                    <NavLink to='/account/api' style={base} activeStyle={activeStyle} className='bh-nav-item'>
-                        <FontAwesomeIcon icon={faKey} fixedWidth style={{ fontSize: '0.79rem' }} />
-                        Clés API
-                    </NavLink>
-                    <NavLink to='/account/ssh' style={base} activeStyle={activeStyle} className='bh-nav-item'>
-                        <FontAwesomeIcon icon={faFingerprint} fixedWidth style={{ fontSize: '0.79rem' }} />
-                        Clés SSH
-                    </NavLink>
+                    {[
+                        { to: '/account',     exact: true,  icon: faUser,        label: 'Mon profil' },
+                        { to: '/account/api', exact: false, icon: faKey,         label: 'Clés API'   },
+                        { to: '/account/ssh', exact: false, icon: faFingerprint, label: 'Clés SSH'   },
+                    ].map(({ to, exact, icon, label }) => (
+                        <OrangeWrap key={to}>
+                            {(hov) => (
+                                <NavLink exact={exact} to={to} className='bh-nav-item'
+                                    style={{ ...base, color: hov ? '#fff' : '#484848' }}
+                                    activeStyle={{ color: hov ? '#fff' : '#FF7D20', fontWeight: 600, background: 'transparent' }}
+                                >
+                                    <FontAwesomeIcon icon={icon} fixedWidth style={{ fontSize: '0.79rem' }} />
+                                    {label}
+                                </NavLink>
+                            )}
+                        </OrangeWrap>
+                    ))}
                 </Section>
 
                 {isAdmin && (
                     <Section title='Administration' defaultOpen={false}>
-                        <a href='/admin' style={base} className='bh-nav-item'>
-                            <FontAwesomeIcon icon={faShieldAlt} fixedWidth style={{ fontSize: '0.79rem' }} />
-                            Admin panel
-                        </a>
+                        <OrangeWrap>
+                            {(hov) => (
+                                <a href='/admin' className='bh-nav-item' style={{ ...base, color: hov ? '#fff' : '#484848' }}>
+                                    <FontAwesomeIcon icon={faShieldAlt} fixedWidth style={{ fontSize: '0.79rem' }} />
+                                    Admin panel
+                                </a>
+                            )}
+                        </OrangeWrap>
                     </Section>
                 )}
             </nav>
@@ -184,7 +232,7 @@ export default () => {
                 }}>
                     <div style={{
                         width: '30px', height: '30px', flexShrink: 0, borderRadius: '8px',
-                        background: 'linear-gradient(135deg, #FF7D20, #a83e00)',
+                        background: '#FF7D20',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         fontSize: '0.78rem', fontWeight: 700, color: '#fff', fontFamily: F,
                     }}>
@@ -194,12 +242,12 @@ export default () => {
                         <div style={{ fontSize: '0.76rem', fontWeight: 600, color: '#b8b8b8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: F }}>
                             {username}
                         </div>
-                        <div style={{ fontSize: '0.61rem', color: '#5a5a5a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: F }}>
+                        <div style={{ fontSize: '0.61rem', color: '#2c2c2c', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: F }}>
                             {isAdmin ? 'Administrateur' : email}
                         </div>
                     </div>
                     <button onClick={logout} disabled={loggingOut} className='bh-logout-btn'
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666', padding: '4px 5px', borderRadius: '6px', flexShrink: 0, transition: 'color 0.15s' }}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#2a2a2a', padding: '4px 5px', borderRadius: '6px', flexShrink: 0, transition: 'color 0.15s' }}
                         title='Déconnexion'>
                         <FontAwesomeIcon icon={faSignOutAlt} />
                     </button>

@@ -21,7 +21,24 @@ export default () => {
     const [currentTxRate, setCurrentTxRate] = useState(0);
 
     const cpu    = useChartTickLabel('CPU', limits.cpu, '%', 2);
-    const memory = useChartTickLabel('Memory', limits.memory, 'MiB');
+    const memory = useChart('Memory', {
+        sets: 1,
+        options: {
+            scales: {
+                y: {
+                    suggestedMax: limits.memory,
+                    ticks: {
+                        callback(value) {
+                            return `${value} MiB`;
+                        },
+                    },
+                },
+            },
+        },
+        callback(opts) {
+            return { ...opts, borderColor: '#a78bfa', backgroundColor: hexToRgba('#a78bfa', 0.18) };
+        },
+    });
     const network = useChart('Network', {
         sets: 2,
         options: {
@@ -37,8 +54,8 @@ export default () => {
         },
         callback(opts, index) {
             const colors = [
-                { border: '#22d3ee', bg: hexToRgba('#22d3ee', 0.1) },
-                { border: '#facc15', bg: hexToRgba('#facc15', 0.1) },
+                { border: '#22d3ee', bg: hexToRgba('#22d3ee', 0.18) },
+                { border: '#facc15', bg: hexToRgba('#facc15', 0.15) },
             ];
             return {
                 ...opts,
@@ -110,6 +127,7 @@ export default () => {
                 title={'CPU Load'}
                 value={cpuValue}
                 maxLabel={limits.cpu > 0 ? `${limits.cpu}%` : undefined}
+                color={'#FF7D20'}
             >
                 <Line {...cpu.props} />
             </ChartBlock>
@@ -117,12 +135,14 @@ export default () => {
                 title={'Mémoire'}
                 value={memValue}
                 maxLabel={limits.memory > 0 ? `${limits.memory} MiB` : undefined}
+                color={'#a78bfa'}
             >
                 <Line {...memory.props} />
             </ChartBlock>
             <ChartBlock
                 title={'Réseau'}
                 value={netValue}
+                color={'#22d3ee'}
             >
                 <Line {...network.props} />
             </ChartBlock>

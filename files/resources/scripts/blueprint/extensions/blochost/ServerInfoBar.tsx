@@ -13,16 +13,6 @@ import {
     faPlay, faRedo, faStop,
 } from '@fortawesome/free-solid-svg-icons';
 
-/* ── Couleur déterministe basée sur le nom ───────────────────── */
-const nameToColor = (name: string): string => {
-    let hash = 0;
-    for (let i = 0; i < name.length; i++) {
-        hash = name.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    const palette = ['#FF7D20', '#22c55e', '#a78bfa', '#22d3ee', '#f472b6', '#fb923c', '#34d399', '#60a5fa'];
-    return palette[Math.abs(hash) % palette.length];
-};
-
 type Stats = { memory: number; cpu: number; disk: number; uptime: number; rx: number; tx: number };
 const F = "'Sora', sans-serif";
 
@@ -178,57 +168,41 @@ const PowerBtn = ({
     label: string; color: string; disabled?: boolean; onClick(): void; icon: any;
 }) => (
     <button disabled={disabled} onClick={onClick} style={{
-        display: 'flex', alignItems: 'center', gap: '0.4rem',
-        background: disabled ? 'rgba(255,255,255,0.04)' : color,
-        border: `1px solid ${disabled ? 'rgba(255,255,255,0.06)' : color}`,
-        borderRadius: '9px',
-        color: disabled ? 'rgba(255,255,255,0.22)' : '#fff',
-        fontWeight: 600, fontSize: '0.78rem', padding: '0.38rem 0.9rem',
-        cursor: disabled ? 'not-allowed' : 'pointer', fontFamily: F,
-        transition: 'opacity .15s', flexShrink: 0,
+        display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
+        background: disabled ? 'rgba(255,255,255,0.04)' : `${color}20`,
+        border: `1px solid ${disabled ? 'rgba(255,255,255,0.07)' : color + '55'}`,
+        borderRadius: '8px',
+        color: disabled ? 'rgba(255,255,255,0.2)' : color,
+        fontFamily: F, fontWeight: 600, fontSize: '0.75rem',
+        padding: '0.3rem 0.7rem',
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        transition: 'background .15s, opacity .15s',
+        flexShrink: 0, whiteSpace: 'nowrap',
     }}>
-        <FontAwesomeIcon icon={icon} style={{ fontSize: '0.7rem' }} />
+        <FontAwesomeIcon icon={icon} style={{ fontSize: '0.65rem' }} />
         {label}
     </button>
 );
 
-/* ── Icône serveur (image custom ou avatar lettre) ───────────── */
-const ServerIcon = ({ name, iconUrl }: { name: string; iconUrl?: string }) => {
-    const [imgError, setImgError] = useState(false);
-    const letter = name.charAt(0).toUpperCase();
-    const color  = nameToColor(name);
-
-    const containerStyle: React.CSSProperties = {
+/* ── Grass-block server icon ─────────────────────────────────── */
+const ServerIcon = () => (
+    <div style={{
         width: '50px', height: '50px', borderRadius: '10px',
         overflow: 'hidden', flexShrink: 0,
         border: '1px solid rgba(255,255,255,0.08)',
-    };
-
-    if (iconUrl && !imgError) {
-        return (
-            <div style={containerStyle}>
-                <img
-                    src={iconUrl}
-                    alt={name}
-                    onError={() => setImgError(true)}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                />
-            </div>
-        );
-    }
-
-    return (
+        background: '#8b5c2a',
+        position: 'relative',
+    }}>
         <div style={{
-            ...containerStyle,
-            background: color,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '1.3rem', fontWeight: 800, color: '#fff',
-            fontFamily: F, userSelect: 'none',
-        }}>
-            {letter}
-        </div>
-    );
-};
+            position: 'absolute', top: 0, left: 0, right: 0, height: '55%',
+            background: '#5a9e2e',
+        }} />
+        <div style={{
+            position: 'absolute', top: '48%', left: 0, right: 0, height: '8%',
+            background: '#4a8020',
+        }} />
+    </div>
+);
 
 /* ══════════════════════════════════════════════════════════════
    MAIN COMPONENT
@@ -241,12 +215,6 @@ export default () => {
     const limits    = ServerContext.useStoreState((s) => s.server.data!.limits);
     const connected = ServerContext.useStoreState((s) => s.socket.connected);
     const instance  = ServerContext.useStoreState((s) => s.socket.instance);
-
-    /* Icône personnalisée : variable d'egg SERVER_ICON (URL image) */
-    const iconUrl = ServerContext.useStoreState((s) => {
-        const v = s.server.data!.variables.find((x) => x.envVariable === 'SERVER_ICON');
-        return v?.serverValue || undefined;
-    });
 
     const allocation = ServerContext.useStoreState((s) => {
         const a = s.server.data!.allocations.find((x) => x.isDefault);
@@ -289,7 +257,7 @@ export default () => {
                 marginBottom: '0.7rem', flexWrap: 'wrap',
             }}>
 
-                <ServerIcon name={name} iconUrl={iconUrl} />
+                <ServerIcon />
 
                 {/* Name + status badge + IP */}
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -298,7 +266,7 @@ export default () => {
                             margin: 0, fontSize: '1.25rem', fontWeight: 800, color: '#e8e8e8',
                             overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: F,
                         }}>
-                            {name}
+                            Blochost
                         </h1>
                         <span style={{
                             display: 'inline-flex', alignItems: 'center', gap: '0.3rem',

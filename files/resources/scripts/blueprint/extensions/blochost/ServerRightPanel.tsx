@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { ServerContext } from '@/state/server';
 import { SocketEvent, SocketRequest } from '@/components/server/events';
 import useWebsocketEvent from '@/plugins/useWebsocketEvent';
-import { bytesToString, mbToBytes } from '@/lib/formatters';
+import { bytesToString, ip, mbToBytes } from '@/lib/formatters';
+import { capitalize } from '@/lib/strings';
+import UptimeDuration from '@/components/server/UptimeDuration';
 import { Link } from 'react-router-dom';
 
 const F = "'Sora', sans-serif";
@@ -81,6 +83,7 @@ export default () => {
     });
 
     const isOffline = status === 'offline';
+    const statusColor = status === 'running' ? '#22c55e' : status === 'offline' ? '#ef4444' : '#eab308';
 
     const memLimit = limits.memory > 0
         ? bytesToString(mbToBytes(limits.memory))
@@ -111,10 +114,27 @@ export default () => {
             <div style={panelStyle}>
                 <SectionHeader title="Informations" />
 
+                <InfoRow label="Statut">
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: statusColor }}>
+                        <span style={{
+                            width: '6px', height: '6px', borderRadius: '50%',
+                            background: statusColor, display: 'inline-block', flexShrink: 0,
+                        }} />
+                        {capitalize(status || 'Hors ligne')}
+                    </span>
+                </InfoRow>
+
                 <InfoRow label="Node">{node}</InfoRow>
 
                 <InfoRow label="Démarré le">
                     {startedAt && !isOffline ? formatDate(startedAt) : '—'}
+                </InfoRow>
+
+                <InfoRow label="Temps de fonctionnement">
+                    {!isOffline && stats.uptime > 0
+                        ? <UptimeDuration uptime={stats.uptime / 1000} />
+                        : '—'
+                    }
                 </InfoRow>
 
                 <InfoRow label="Mémoire assignée">{memLimit}</InfoRow>
@@ -124,6 +144,45 @@ export default () => {
                 </InfoRow>
             </div>
 
+            {/* ── JOUEURS ── */}
+            <div style={panelStyle}>
+                <SectionHeader
+                    title="Joueurs"
+                    action={
+                        <Link
+                            to={`/server/${serverId}/users`}
+                            style={{
+                                fontSize: '0.68rem', fontWeight: 600,
+                                color: '#FF7D20', fontFamily: F,
+                                border: '1px solid rgba(255,125,32,0.45)',
+                                borderRadius: '6px', padding: '2px 8px',
+                                textDecoration: 'none',
+                                transition: 'background .15s',
+                            }}
+                        >
+                            Voir tous
+                        </Link>
+                    }
+                />
+
+                <div style={{
+                    fontSize: '1rem', fontWeight: 700, color: '#e0e0e0',
+                    marginBottom: '0.4rem', fontFamily: F,
+                }}>
+                    — / —
+                </div>
+
+                {/* Progress bar */}
+                <div style={{
+                    height: '4px', background: 'rgba(255,255,255,0.08)',
+                    borderRadius: '4px', overflow: 'hidden',
+                }}>
+                    <div style={{
+                        height: '100%', width: '0%',
+                        background: '#FF7D20', borderRadius: '4px',
+                    }} />
+                </div>
+            </div>
 
         </div>
     );

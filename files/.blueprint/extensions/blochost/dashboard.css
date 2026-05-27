@@ -60,10 +60,9 @@ html, body { background-color: var(--bh-bg) !important; }
     padding-left: var(--bh-sidebar-w) !important;
 }
 
-/* Hover des liens de navigation */
+/* Hover géré par React (clip-path animation) */
 .bh-nav-item:hover {
-    background: rgba(255, 125, 32, 0.1) !important;
-    color: #FF7D20 !important;
+    background: transparent !important;
 }
 
 /* Bouton déconnexion */
@@ -77,51 +76,11 @@ html, body { background-color: var(--bh-bg) !important; }
 /* Titre + boutons power originaux (remplacés par ServerInfoBar) */
 .grid.grid-cols-4.gap-4.mb-4 { display: none !important; }
 
-/* ═══════════════════════════════════════════════════════════════
-   CONSOLE PANEL — Styling du terminal intégré
-   ═══════════════════════════════════════════════════════════════ */
+/* Bloc ServerDetails dans la sidebar droite (remplacé) */
+.col-span-4.lg\:col-span-1.order-last.lg\:order-none { display: none !important; }
 
-/* Supprimer le border-radius du haut du terminal (le header custom le gère) */
-[class*="container_"] {
-    background: #111111 !important;
-    border-radius: 0 0 10px 10px !important;
-    border-top: none !important;
-}
-
-/* Input de commande — style BLOCHOST */
-[class*="command_input"] {
-    background: #0d0d0d !important;
-    border-top: 1px solid rgba(255,255,255,0.06) !important;
-    border-radius: 0 0 10px 10px !important;
-    border-left: none !important;
-    border-right: none !important;
-    border-bottom: none !important;
-    color: #d0d0d0 !important;
-}
-
-[class*="command_input"]:focus, [class*="command_input"]:active {
-    border-color: rgba(255,125,32,0.3) !important;
-    box-shadow: none !important;
-    outline: none !important;
-}
-
-/* Supprimer le focus ring bleu du navigateur sur le canvas xterm */
-.xterm:focus, .xterm-viewport:focus, .xterm-screen:focus,
-.xterm canvas, .xterm canvas:focus {
-    outline: none !important;
-    box-shadow: none !important;
-}
-
-[class*="command_icon"] {
-    color: rgba(255,125,32,0.45) !important;
-}
-
-/* Override chart container (géré par ChartBlock JSX maintenant) */
-[class*="chart_container"] {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-}
+/* Étendre la console sur toute la largeur disponible */
+.flex.col-span-4.lg\:col-span-3 { grid-column: span 4 / span 4 !important; }
 
 
 /* ═══════════════════════════════════════════════════════════════
@@ -142,7 +101,6 @@ a[href*="/server/"][class]:not(.bh-nav-item):not([href*="/files"]):not([href*="/
     transform: translateY(-1px) !important;
 }
 
-/* Reset explicite pour les liens de navigation sidebar */
 a.bh-nav-item {
     background: transparent !important;
     border: none !important;
@@ -167,6 +125,33 @@ a.bh-nav-item {
 .rounded.shadow > div:first-child {
     background: rgba(255, 255, 255, 0.02) !important;
     border-bottom: 1px solid var(--bh-border) !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   GRAPHIQUES — Carte et canvas
+   ═══════════════════════════════════════════════════════════════ */
+[class*="chart_container"] {
+    background: unset !important;
+    border: unset !important;
+    border-radius: unset !important;
+    box-shadow: unset !important;
+    overflow: hidden !important;
+}
+
+[class*="chart_container"] > div:first-child {
+    background: unset !important;
+    border-bottom: unset !important;
+    display: unset !important;
+    align-items: unset !important;
+    gap: unset !important;
+    padding: unset !important;
+}
+[class*="chart_container"] > div:first-child::before { display: none !important; }
+[class*="chart_container"] > div:first-child h3 { all: unset !important; }
+[class*="chart_container"] > div:last-child {
+    background: unset !important;
+    padding: unset !important;
 }
 
 
@@ -244,61 +229,6 @@ button[role="switch"][aria-checked="true"] > span {
 .bg-gray-900, .bg-neutral-900 { background-color: var(--bh-bg) !important; }
 
 /* ═══════════════════════════════════════════════════════════════
-   GESTIONNAIRE DE FICHIERS
+   FOOTER — invisible
    ═══════════════════════════════════════════════════════════════ */
-
-
-/* Breadcrumb bar — fond panel */
-.flex.flex-wrap-reverse,
-.flex.flex-wrap-reverse.md\:flex-nowrap {
-    background: #191919 !important;
-    border: 1px solid rgba(255,255,255,0.06) !important;
-    border-radius: 12px !important;
-    padding: 0.55rem 0.75rem !important;
-    margin-bottom: 0.5rem !important;
-    align-items: center !important;
-}
-
-/* Séparateur "/" dans le breadcrumb */
-.flex.flex-wrap-reverse.md\:flex-nowrap > * { color: #555 !important; }
-
-/* Zone "This directory seems to be empty" */
-p.text-sm.text-neutral-400.text-center {
-    background: #191919 !important;
-    border: 1px solid rgba(255,255,255,0.06) !important;
-    border-radius: 10px !important;
-    padding: 2rem !important;
-    color: #555 !important;
-}
-
-/* Barre d'actions masse (Move / Archive / Delete) */
-div[class*="bg-black\/50"] {
-    background: rgba(25,25,25,0.95) !important;
-    border: 1px solid rgba(255,255,255,0.1) !important;
-    border-radius: 14px !important;
-    backdrop-filter: blur(8px) !important;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   ÉDITEUR CODEMIRROR
-   ═══════════════════════════════════════════════════════════════ */
-.cm-s-ayu-mirage.CodeMirror {
-    background: #191919 !important;
-    color: #d0d0d0 !important;
-    border-radius: 10px !important;
-}
-.cm-s-ayu-mirage .CodeMirror-gutters {
-    background: #141414 !important;
-    border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
-    border-radius: 10px 0 0 10px !important;
-}
-.cm-s-ayu-mirage .CodeMirror-linenumber { color: #3a3a3a !important; }
-.cm-s-ayu-mirage div.CodeMirror-selected { background: rgba(255, 125, 32, 0.18) !important; }
-.cm-s-ayu-mirage .CodeMirror-cursor { border-left-color: #FF7D20 !important; }
-.cm-s-ayu-mirage .CodeMirror-activeline-background { background: rgba(255,255,255,0.025) !important; }
-
-/* ═══════════════════════════════════════════════════════════════
-   FOOTER
-   ═══════════════════════════════════════════════════════════════ */
-#app p.text-center { color: #2a2a2a !important; }
-#app p.text-center a { color: #2a2a2a !important; text-decoration: none !important; }
+#app p.text-center, #app p.text-center a { color: #191919 !important; }

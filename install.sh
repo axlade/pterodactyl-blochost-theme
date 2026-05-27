@@ -6,11 +6,13 @@ set -e
 #  Usage : bash <(curl -s https://raw.githubusercontent.com/axlade/pterodactyl-blochost-theme/main/install.sh)
 # ─────────────────────────────────────────────────────────────
 
-REPO="https://raw.githubusercontent.com/axlade/pterodactyl-blochost-theme/main/files"
+REPO_RAW="https://raw.githubusercontent.com/axlade/pterodactyl-blochost-theme/main"
+REPO_FILES="$REPO_RAW/files"
 PTERO="/var/www/pterodactyl"
 GREEN="\e[32m"
 ORANGE="\e[33m"
 RED="\e[31m"
+BOLD="\e[1m"
 RESET="\e[0m"
 
 echo -e "${ORANGE}"
@@ -21,25 +23,88 @@ echo "  ██╔══██╗██║     ██║   ██║██║    
 echo "  ██████╔╝███████╗╚██████╔╝╚██████╗██║  ██║╚██████╔╝███████║   ██║   "
 echo "  ╚═════╝ ╚══════╝ ╚═════╝  ╚═════╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝   ╚═╝   "
 echo -e "${RESET}"
-echo -e "  ${ORANGE}Thème Pterodactyl — Installation${RESET}"
+echo -e "  ${ORANGE}${BOLD}Thème Pterodactyl v1.1 — Installation complète${RESET}"
 echo ""
 
-# Vérifications
+# ── Vérifications préliminaires ─────────────────────────────
+if [ "$EUID" -ne 0 ]; then
+    echo -e "${RED}✗ Ce script doit être exécuté en root (sudo).${RESET}"
+    exit 1
+fi
+
 if [ ! -d "$PTERO" ]; then
     echo -e "${RED}✗ Pterodactyl introuvable à $PTERO${RESET}"
     exit 1
 fi
 
 if ! command -v curl &>/dev/null; then
-    echo -e "${RED}✗ curl est requis${RESET}"
+    echo -e "${RED}✗ curl est requis. Installe-le avec : apt install curl${RESET}"
     exit 1
 fi
 
+if ! command -v unzip &>/dev/null; then
+    echo -e "${ORANGE}→${RESET} Installation de unzip..."
+    apt-get install -y unzip -q
+fi
+
 echo -e "${ORANGE}→${RESET} Pterodactyl détecté : $PTERO"
-echo -e "${ORANGE}→${RESET} Téléchargement des fichiers du thème..."
 echo ""
 
-# Liste de tous les fichiers à télécharger
+# ════════════════════════════════════════════════════════════
+#  ÉTAPE 1 — Installation de Blueprint
+# ════════════════════════════════════════════════════════════
+echo -e "${ORANGE}${BOLD}[ 1/4 ] Blueprint${RESET}"
+
+if command -v blueprint &>/dev/null; then
+    BP_VER=$(blueprint -v 2>/dev/null || echo "inconnu")
+    echo -e "  ${GREEN}✓${RESET} Blueprint déjà installé (version : $BP_VER)"
+else
+    echo -e "  ${ORANGE}→${RESET} Téléchargement de Blueprint..."
+    cd "$PTERO"
+
+    BP_ZIP_URL="https://github.com/blueprintframework/blueprint/releases/latest/download/blueprint.zip"
+    curl -fsSL "$BP_ZIP_URL" -o blueprint.zip
+    unzip -o blueprint.zip -d . > /dev/null
+    rm -f blueprint.zip
+
+    chmod +x blueprint.sh
+    echo -e "  ${ORANGE}→${RESET} Installation de Blueprint (peut prendre quelques minutes)..."
+    bash blueprint.sh
+
+    if ! command -v blueprint &>/dev/null; then
+        echo -e "  ${RED}✗ Échec de l'installation de Blueprint${RESET}"
+        exit 1
+    fi
+
+    BP_VER=$(blueprint -v 2>/dev/null || echo "inconnu")
+    echo -e "  ${GREEN}✓${RESET} Blueprint installé (version : $BP_VER)"
+fi
+
+echo ""
+
+# ════════════════════════════════════════════════════════════
+#  ÉTAPE 2 — Installation de l'extension Blueprint blochost
+# ════════════════════════════════════════════════════════════
+echo -e "${ORANGE}${BOLD}[ 2/4 ] Extension Blueprint blochost${RESET}"
+
+BLUEPRINT_FILE="$PTERO/blochost.blueprint"
+echo -e "  ${ORANGE}→${RESET} Téléchargement de blochost.blueprint v1.1..."
+curl -fsSL "$REPO_RAW/dist/blochost.blueprint" -o "$BLUEPRINT_FILE"
+
+echo -e "  ${ORANGE}→${RESET} Installation de l'extension via Blueprint..."
+cd "$PTERO"
+blueprint -install blochost
+
+echo -e "  ${GREEN}✓${RESET} Extension blochost installée"
+echo ""
+
+# ════════════════════════════════════════════════════════════
+#  ÉTAPE 3 — Fichiers du thème (composants Pterodactyl core)
+# ════════════════════════════════════════════════════════════
+echo -e "${ORANGE}${BOLD}[ 3/4 ] Fichiers du thème${RESET}"
+echo -e "  ${ORANGE}→${RESET} Téléchargement des fichiers..."
+echo ""
+
 FILES=(
     "tailwind.config.js"
     "resources/scripts/components/auth/LoginContainer.tsx"
@@ -70,7 +135,6 @@ FILES=(
     "resources/scripts/blueprint/extensions/blochost/ServerRightPanel.tsx"
     "resources/scripts/blueprint/extensions/blochost/HeroBanner.tsx"
     "resources/scripts/blueprint/extensions/blochost/Components.yml"
-    ".blueprint/extensions/blochost/dashboard.css"
 )
 
 TOTAL=${#FILES[@]}
@@ -82,7 +146,7 @@ for FILE in "${FILES[@]}"; do
     DEST="$PTERO/$FILE"
     mkdir -p "$(dirname "$DEST")"
 
-    if curl -fsSL "$REPO/$FILE" -o "$DEST"; then
+    if curl -fsSL "$REPO_FILES/$FILE" -o "$DEST"; then
         echo -e "  ${GREEN}✓${RESET} [$COUNT/$TOTAL] $FILE"
     else
         echo -e "  ${RED}✗${RESET} [$COUNT/$TOTAL] Échec : $FILE"
@@ -97,14 +161,25 @@ if [ "$ERRORS" -gt 0 ]; then
 fi
 
 echo ""
-echo -e "${ORANGE}→${RESET} Compilation du frontend..."
+
+# ════════════════════════════════════════════════════════════
+#  ÉTAPE 4 — Compilation & cache
+# ════════════════════════════════════════════════════════════
+echo -e "${ORANGE}${BOLD}[ 4/4 ] Compilation du frontend${RESET}"
 cd "$PTERO"
+
+echo -e "  ${ORANGE}→${RESET} yarn build:production..."
 NODE_OPTIONS=--openssl-legacy-provider yarn build:production
 
-echo ""
-echo -e "${ORANGE}→${RESET} Nettoyage du cache Laravel..."
+echo -e "  ${ORANGE}→${RESET} Nettoyage du cache Laravel..."
 php artisan optimize:clear
 
+# Fix permissions
+chown -R www-data:www-data "$PTERO/public" "$PTERO/storage" 2>/dev/null || true
+
 echo ""
-echo -e "${GREEN}✅ Thème BLOCHOST installé avec succès !${RESET}"
+echo -e "${GREEN}${BOLD}✅ Thème BLOCHOST v1.1 installé avec succès !${RESET}"
+echo ""
+echo -e "  ${ORANGE}Blueprint :${RESET} $(blueprint -v 2>/dev/null || echo 'ok')"
+echo -e "  ${ORANGE}Thème    :${RESET} v1.1 — dark/orange | sidebar animée | graphiques gradient"
 echo ""
