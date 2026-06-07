@@ -47,6 +47,40 @@ if ! command -v unzip &>/dev/null; then
     apt-get install -y unzip -q
 fi
 
+# ── Node.js ≥ 22 ────────────────────────────────────────────
+NODE_OK=false
+if command -v node &>/dev/null; then
+    NODE_MAJOR=$(node -e "process.stdout.write(String(parseInt(process.version.slice(1))))" 2>/dev/null)
+    if [ "${NODE_MAJOR:-0}" -ge 22 ] 2>/dev/null; then
+        NODE_OK=true
+    fi
+fi
+
+if [ "$NODE_OK" = false ]; then
+    echo -e "${ORANGE}→${RESET} Installation de Node.js 22..."
+    curl -fsSL https://deb.nodesource.com/setup_22.x | bash - > /dev/null 2>&1
+    apt-get install -y nodejs -q
+    echo -e "${GREEN}✓${RESET} Node.js $(node -v) installé"
+else
+    echo -e "${GREEN}✓${RESET} Node.js $(node -v) déjà présent"
+fi
+
+# ── Yarn ────────────────────────────────────────────────────
+if ! command -v yarn &>/dev/null; then
+    echo -e "${ORANGE}→${RESET} Installation de yarn..."
+    npm install -g yarn -q
+    echo -e "${GREEN}✓${RESET} yarn $(yarn -v) installé"
+else
+    echo -e "${GREEN}✓${RESET} yarn $(yarn -v) déjà présent"
+fi
+
+# ── Dépendances node_modules ────────────────────────────────
+if [ ! -d "$PTERO/node_modules" ] || [ ! -d "$PTERO/node_modules/react" ]; then
+    echo -e "${ORANGE}→${RESET} Installation des dépendances npm (yarn install)..."
+    cd "$PTERO" && yarn install --frozen-lockfile 2>&1 | tail -5
+    echo -e "${GREEN}✓${RESET} Dépendances installées"
+fi
+
 echo -e "${ORANGE}→${RESET} Pterodactyl détecté : $PTERO"
 echo ""
 
@@ -210,7 +244,8 @@ echo -e "${ORANGE}${BOLD}[ 4/4 ] Compilation du frontend${RESET}"
 cd "$PTERO"
 
 echo -e "  ${ORANGE}→${RESET} yarn build:production..."
-NODE_OPTIONS=--openssl-legacy-provider yarn build:production
+export NODE_OPTIONS=--openssl-legacy-provider
+cd "$PTERO" && yarn build:production
 
 echo -e "  ${ORANGE}→${RESET} Nettoyage du cache Laravel..."
 php artisan optimize:clear
