@@ -65,20 +65,35 @@ else
     echo -e "${GREEN}✓${RESET} Node.js $(node -v) déjà présent"
 fi
 
-# ── Yarn ────────────────────────────────────────────────────
-if ! command -v yarn &>/dev/null; then
+# ── Yarn JS (détection et remplacement si cmdtest installé) ─
+YARN_OK=false
+if command -v yarn &>/dev/null; then
+    YARN_VER=$(yarn --version 2>/dev/null || echo "bad")
+    # Le vrai yarn affiche x.y.z — cmdtest affiche autre chose ou plante
+    if echo "$YARN_VER" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+        YARN_OK=true
+    else
+        echo -e "${ORANGE}→${RESET} Faux yarn détecté (cmdtest), remplacement..."
+        apt-get remove -y cmdtest 2>/dev/null || true
+        rm -f /usr/bin/yarn /usr/local/bin/yarn 2>/dev/null || true
+    fi
+fi
+
+if [ "$YARN_OK" = false ]; then
     echo -e "${ORANGE}→${RESET} Installation de yarn..."
-    npm install -g yarn -q
-    echo -e "${GREEN}✓${RESET} yarn $(yarn -v) installé"
+    npm install -g yarn --silent
+    echo -e "${GREEN}✓${RESET} yarn $(yarn --version) installé"
 else
-    echo -e "${GREEN}✓${RESET} yarn $(yarn -v) déjà présent"
+    echo -e "${GREEN}✓${RESET} yarn $YARN_VER déjà présent"
 fi
 
 # ── Dépendances node_modules ────────────────────────────────
-if [ ! -d "$PTERO/node_modules" ] || [ ! -d "$PTERO/node_modules/react" ]; then
+if [ ! -d "$PTERO/node_modules/react" ] || [ ! -d "$PTERO/node_modules/webpack" ]; then
     echo -e "${ORANGE}→${RESET} Installation des dépendances npm (yarn install)..."
-    cd "$PTERO" && yarn install --frozen-lockfile 2>&1 | tail -5
+    cd "$PTERO" && yarn install 2>&1 | tail -3
     echo -e "${GREEN}✓${RESET} Dépendances installées"
+else
+    echo -e "${GREEN}✓${RESET} node_modules déjà présents"
 fi
 
 echo -e "${ORANGE}→${RESET} Pterodactyl détecté : $PTERO"
@@ -120,6 +135,9 @@ echo ""
 #  ÉTAPE 2 — Installation de l'extension Blueprint blochost
 # ════════════════════════════════════════════════════════════
 echo -e "${ORANGE}${BOLD}[ 2/4 ] Extension Blueprint blochost${RESET}"
+
+# Supprimer le lockfile Blueprint (résidu d'une install précédente)
+rm -f "$PTERO/.blueprint/.lock" 2>/dev/null || true
 
 BLUEPRINT_FILE="$PTERO/blochost.blueprint"
 echo -e "  ${ORANGE}→${RESET} Téléchargement de blochost.blueprint v1.2..."
@@ -245,7 +263,7 @@ cd "$PTERO"
 
 echo -e "  ${ORANGE}→${RESET} yarn build:production..."
 export NODE_OPTIONS=--openssl-legacy-provider
-cd "$PTERO" && yarn build:production
+yarn build:production
 
 echo -e "  ${ORANGE}→${RESET} Nettoyage du cache Laravel..."
 php artisan optimize:clear
