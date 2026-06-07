@@ -15,15 +15,29 @@ const TitledGreyBox = ({ icon, title, children, className }: Props) => (
     <div
         css={tw`rounded shadow-md`}
         className={className}
-        style={{ background: '#191919', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px' }}
+        style={{
+            background: 'var(--bh-surface)',
+            border: '1px solid var(--bh-border)',
+            borderRadius: '12px',
+            transition: 'background 0.3s, border-color 0.3s',
+        }}
     >
         <div
             css={tw`rounded-t p-3`}
-            style={{ background: '#141414', borderBottom: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px 12px 0 0' }}
+            style={{
+                background: 'var(--bh-surface2)',
+                borderBottom: '1px solid var(--bh-border)',
+                borderRadius: '12px 12px 0 0',
+                transition: 'background 0.3s, border-color 0.3s',
+            }}
         >
             {typeof title === 'string' ? (
-                <p css={tw`text-sm uppercase`} style={{ color: 'rgba(255,255,255,0.5)', letterSpacing: '0.08em', fontSize: '0.7rem', fontWeight: 700 }}>
-                    {icon && <FontAwesomeIcon icon={icon} css={tw`mr-2`} style={{ color: 'rgba(255,255,255,0.35)' }} />}
+                <p css={tw`text-sm uppercase`} style={{
+                    color: 'var(--bh-title-color)',
+                    letterSpacing: '0.08em', fontSize: '0.7rem', fontWeight: 700,
+                    transition: 'color 0.3s',
+                }}>
+                    {icon && <FontAwesomeIcon icon={icon} css={tw`mr-2`} style={{ color: 'var(--bh-icon-muted)', transition: 'color 0.3s' }} />}
                     {title}
                 </p>
             ) : (

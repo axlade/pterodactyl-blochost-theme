@@ -1,19 +1,51 @@
 /* ============================================================
-   BLOCHOST THEME — Dark / Orange
-   Toutes les modifications sont dans cette extension uniquement.
+   BLOCHOST THEME — Dark / Orange  +  Light mode
    ============================================================ */
 @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap');
 
-/* ── Variables ──────────────────────────────────────────────── */
+/* ── Variables — Dark (défaut) ──────────────────────────────── */
 :root {
     --bh-orange:      #FF7D20;
     --bh-bg:          #111111;
     --bh-surface:     #191919;
+    --bh-surface2:    #141414;
     --bh-border:      rgba(255, 255, 255, 0.07);
     --bh-text:        #d0d0d0;
     --bh-muted:       rgba(255, 255, 255, 0.3);
+    --bh-title-color: rgba(255, 255, 255, 0.5);
+    --bh-icon-muted:  rgba(255, 255, 255, 0.35);
+    --bh-file-hover:  #212121;
+    --bh-file-name:   #d0d0d0;
+    --bh-file-meta:   #888888;
     --bh-sidebar-w:   220px;
     --bh-radius:      14px;
+    --bh-panel-hd:    rgba(255, 255, 255, 0.02);
+    --bh-input-bg:    #141414;
+    --bh-input-bd:    #282828;
+    --bh-input-txt:   #d4d4d4;
+    --bh-scroll:      #2a2a2a;
+    --bh-footer:      #191919;
+}
+
+/* ── Variables — Light ──────────────────────────────────────── */
+html[data-theme="light"] {
+    --bh-bg:          #f0f0f3;
+    --bh-surface:     #ffffff;
+    --bh-surface2:    #f5f5f7;
+    --bh-border:      rgba(0, 0, 0, 0.08);
+    --bh-text:        #1a1a1a;
+    --bh-muted:       rgba(0, 0, 0, 0.4);
+    --bh-title-color: rgba(0, 0, 0, 0.5);
+    --bh-icon-muted:  rgba(0, 0, 0, 0.3);
+    --bh-file-hover:  rgba(0, 0, 0, 0.03);
+    --bh-file-name:   #1a1a1a;
+    --bh-file-meta:   #888888;
+    --bh-panel-hd:    rgba(0, 0, 0, 0.02);
+    --bh-input-bg:    #ffffff;
+    --bh-input-bd:    rgba(0, 0, 0, 0.12);
+    --bh-input-txt:   #1a1a1a;
+    --bh-scroll:      rgba(0, 0, 0, 0.15);
+    --bh-footer:      #f0f0f3;
 }
 
 /* ── Font globale ───────────────────────────────────────────── */
@@ -23,63 +55,37 @@ p, span, div, a, h1, h2, h3, h4, h5, li {
     font-family: 'Sora', sans-serif;
 }
 
-/* Conserver la police mono dans le terminal */
 .xterm, .xterm *, #terminal, #terminal * {
     font-family: 'Courier New', Courier, monospace !important;
 }
 
 /* ── Background global ──────────────────────────────────────── */
-html, body { background-color: var(--bh-bg) !important; }
-#app { background-color: var(--bh-bg) !important; min-height: 100vh; }
+html, body { background-color: var(--bh-bg) !important; transition: background-color 0.3s; }
+#app { background-color: var(--bh-bg) !important; min-height: 100vh; transition: background-color 0.3s; }
 
 
 /* ═══════════════════════════════════════════════════════════════
-   SIDEBAR — remplace la navbar horizontale
+   SIDEBAR
    ═══════════════════════════════════════════════════════════════ */
-
-/* Réduire la navbar à zéro sans la masquer (sinon la Sidebar fixed disparaît aussi) */
 #NavigationBar {
-    height: 0 !important;
-    min-height: 0 !important;
-    overflow: visible !important;
-    padding: 0 !important;
-    border: none !important;
-    background: transparent !important;
+    height: 0 !important; min-height: 0 !important;
+    overflow: visible !important; padding: 0 !important;
+    border: none !important; background: transparent !important;
     box-shadow: none !important;
 }
-
-/* Cacher le contenu natif de la navbar (logo, liens) mais PAS notre sidebar */
 #NavigationBar > .mx-auto { display: none !important; }
 #NavigationBar > div:not(#bh-sidebar) > * { display: none !important; }
-
-/* Cacher la sous-navigation horizontale (onglets serveur) */
 #SubNavigation { display: none !important; }
-
-/* Décaler tout le contenu sous la sidebar */
-#app > div {
-    padding-left: var(--bh-sidebar-w) !important;
-}
-
-/* Hover géré par React (clip-path animation) */
-.bh-nav-item:hover {
-    background: transparent !important;
-}
-
-/* Bouton déconnexion */
+#app > div { padding-left: var(--bh-sidebar-w) !important; }
+.bh-nav-item:hover { background: transparent !important; }
 .bh-logout-btn:hover { color: var(--bh-orange) !important; }
 
 
 /* ═══════════════════════════════════════════════════════════════
    CACHER LES ÉLÉMENTS PTERODACTYL REMPLACÉS
    ═══════════════════════════════════════════════════════════════ */
-
-/* Titre + boutons power originaux (remplacés par ServerInfoBar) */
 .grid.grid-cols-4.gap-4.mb-4 { display: none !important; }
-
-/* Bloc ServerDetails dans la sidebar droite (remplacé) */
 .col-span-4.lg\:col-span-1.order-last.lg\:order-none { display: none !important; }
-
-/* Étendre la console sur toute la largeur disponible */
 .flex.col-span-4.lg\:col-span-3 { grid-column: span 4 / span 4 !important; }
 
 
@@ -91,21 +97,17 @@ a[href*="/server/"][class]:not(.bh-nav-item):not([href*="/files"]):not([href*="/
     border: 1px solid var(--bh-border) !important;
     border-radius: var(--bh-radius) !important;
     box-shadow: none !important;
-    transition: border-color 0.2s, transform 0.18s !important;
+    transition: border-color 0.2s, transform 0.18s, background 0.3s !important;
     text-decoration: none !important;
     color: var(--bh-text) !important;
 }
-
 a[href*="/server/"][class]:not(.bh-nav-item):not([href*="/files"]):not([href*="/edit"]):hover {
     border-color: rgba(255, 125, 32, 0.4) !important;
     transform: translateY(-1px) !important;
 }
-
 a.bh-nav-item {
     background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    transform: none !important;
+    border: none !important; box-shadow: none !important; transform: none !important;
 }
 
 
@@ -118,41 +120,31 @@ a.bh-nav-item {
     border: 1px solid var(--bh-border) !important;
     border-radius: var(--bh-radius) !important;
     box-shadow: none !important;
+    transition: background 0.3s, border-color 0.3s !important;
 }
-
-/* En-tête des panneaux */
 .rounded.shadow-md > div:first-child,
 .rounded.shadow > div:first-child {
-    background: rgba(255, 255, 255, 0.02) !important;
+    background: var(--bh-panel-hd) !important;
     border-bottom: 1px solid var(--bh-border) !important;
 }
 
 
 /* ═══════════════════════════════════════════════════════════════
-   GRAPHIQUES — Carte et canvas
+   GRAPHIQUES — laisser le composant React gérer les styles
    ═══════════════════════════════════════════════════════════════ */
 [class*="chart_container"] {
-    background: unset !important;
-    border: unset !important;
-    border-radius: unset !important;
-    box-shadow: unset !important;
+    background: unset !important; border: unset !important;
+    border-radius: unset !important; box-shadow: unset !important;
     overflow: hidden !important;
 }
-
 [class*="chart_container"] > div:first-child {
-    background: unset !important;
-    border-bottom: unset !important;
-    display: unset !important;
-    align-items: unset !important;
-    gap: unset !important;
-    padding: unset !important;
+    background: unset !important; border-bottom: unset !important;
+    display: unset !important; align-items: unset !important;
+    gap: unset !important; padding: unset !important;
 }
 [class*="chart_container"] > div:first-child::before { display: none !important; }
 [class*="chart_container"] > div:first-child h3 { all: unset !important; }
-[class*="chart_container"] > div:last-child {
-    background: unset !important;
-    padding: unset !important;
-}
+[class*="chart_container"] > div:last-child { background: unset !important; padding: unset !important; }
 
 
 /* ═══════════════════════════════════════════════════════════════
@@ -160,12 +152,12 @@ a.bh-nav-item {
    ═══════════════════════════════════════════════════════════════ */
 input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
 select, textarea {
-    background: #141414 !important;
-    border: 1px solid #282828 !important;
+    background: var(--bh-input-bg) !important;
+    border: 1px solid var(--bh-input-bd) !important;
     border-radius: 10px !important;
-    color: #d4d4d4 !important;
+    color: var(--bh-input-txt) !important;
+    transition: background 0.3s, border-color 0.2s, color 0.3s !important;
 }
-
 input:not([type="checkbox"]):not([type="radio"]):focus,
 select:focus, textarea:focus {
     border-color: rgba(255, 125, 32, 0.45) !important;
@@ -179,18 +171,11 @@ select:focus, textarea:focus {
    ═══════════════════════════════════════════════════════════════ */
 button[type="submit"] {
     background: var(--bh-orange) !important;
-    border: none !important;
-    border-radius: 10px !important;
-    color: #fff !important;
-    font-weight: 600 !important;
+    border: none !important; border-radius: 10px !important;
+    color: #fff !important; font-weight: 600 !important;
 }
-
 button[type="submit"]:hover { opacity: 0.88 !important; }
-
-button[type="submit"]:disabled {
-    opacity: 0.4 !important;
-    cursor: not-allowed !important;
-}
+button[type="submit"]:disabled { opacity: 0.4 !important; cursor: not-allowed !important; }
 
 
 /* ═══════════════════════════════════════════════════════════════
@@ -206,29 +191,43 @@ button[role="switch"][aria-checked="true"] > span {
    ═══════════════════════════════════════════════════════════════ */
 ::-webkit-scrollbar       { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }
+::-webkit-scrollbar-thumb { background: var(--bh-scroll); border-radius: 2px; transition: background 0.3s; }
 ::-webkit-scrollbar-thumb:hover { background: var(--bh-orange); }
 
 
 /* ═══════════════════════════════════════════════════════════════
-   TEXTES TAILWIND — remapper les couleurs du thème
+   TEXTES TAILWIND
    ═══════════════════════════════════════════════════════════════ */
-.text-gray-100, .text-neutral-100 { color: #e8e8e8 !important; }
-.text-gray-200, .text-neutral-200 { color: #c0c0c0 !important; }
-.text-gray-300, .text-neutral-300 { color: #999 !important; }
-.text-gray-400, .text-neutral-400 { color: #666 !important; }
-.text-gray-500, .text-neutral-500 { color: #444 !important; }
+.text-gray-100, .text-neutral-100 { color: var(--bh-text) !important; }
+.text-gray-200, .text-neutral-200 { color: var(--bh-muted) !important; }
+.text-gray-300, .text-neutral-300 { color: var(--bh-muted) !important; }
+.text-gray-400, .text-neutral-400 { color: var(--bh-muted) !important; }
+.text-gray-500, .text-neutral-500 { color: var(--bh-muted) !important; }
 .text-cyan-400 { color: var(--bh-orange) !important; }
 .text-cyan-200 { color: #ffb87a !important; }
+
+/* Light mode — renforcer la lisibilité des textes */
+html[data-theme="light"] .text-gray-100,
+html[data-theme="light"] .text-neutral-100 { color: #111111 !important; }
+html[data-theme="light"] .text-gray-200,
+html[data-theme="light"] .text-neutral-200 { color: #333333 !important; }
+html[data-theme="light"] .text-gray-300,
+html[data-theme="light"] .text-neutral-300 { color: #555555 !important; }
+html[data-theme="light"] .text-gray-400,
+html[data-theme="light"] .text-neutral-400 { color: #777777 !important; }
+html[data-theme="light"] .text-gray-500,
+html[data-theme="light"] .text-neutral-500 { color: #999999 !important; }
+
 
 /* ═══════════════════════════════════════════════════════════════
    BACKGROUNDS TAILWIND
    ═══════════════════════════════════════════════════════════════ */
-.bg-gray-700, .bg-neutral-700 { background-color: var(--bh-surface) !important; }
-.bg-gray-800, .bg-neutral-800 { background-color: #141414 !important; }
-.bg-gray-900, .bg-neutral-900 { background-color: var(--bh-bg) !important; }
+.bg-gray-700, .bg-neutral-700 { background-color: var(--bh-surface) !important; transition: background 0.3s !important; }
+.bg-gray-800, .bg-neutral-800 { background-color: var(--bh-input-bg) !important; transition: background 0.3s !important; }
+.bg-gray-900, .bg-neutral-900 { background-color: var(--bh-bg) !important; transition: background 0.3s !important; }
+
 
 /* ═══════════════════════════════════════════════════════════════
-   FOOTER — invisible
+   FOOTER
    ═══════════════════════════════════════════════════════════════ */
-#app p.text-center, #app p.text-center a { color: #191919 !important; }
+#app p.text-center, #app p.text-center a { color: var(--bh-footer) !important; }

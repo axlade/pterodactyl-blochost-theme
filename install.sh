@@ -23,7 +23,7 @@ echo "  ██╔══██╗██║     ██║   ██║██║    
 echo "  ██████╔╝███████╗╚██████╔╝╚██████╗██║  ██║╚██████╔╝███████║   ██║   "
 echo "  ╚═════╝ ╚══════╝ ╚═════╝  ╚═════╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝   ╚═╝   "
 echo -e "${RESET}"
-echo -e "  ${ORANGE}${BOLD}Thème Pterodactyl v1.1 — Installation complète${RESET}"
+echo -e "  ${ORANGE}${BOLD}Thème Pterodactyl v1.2 — Installation complète${RESET}"
 echo ""
 
 # ── Vérifications préliminaires ─────────────────────────────
@@ -88,7 +88,7 @@ echo ""
 echo -e "${ORANGE}${BOLD}[ 2/4 ] Extension Blueprint blochost${RESET}"
 
 BLUEPRINT_FILE="$PTERO/blochost.blueprint"
-echo -e "  ${ORANGE}→${RESET} Téléchargement de blochost.blueprint v1.1..."
+echo -e "  ${ORANGE}→${RESET} Téléchargement de blochost.blueprint v1.2..."
 curl -fsSL "$REPO_RAW/dist/blochost.blueprint" -o "$BLUEPRINT_FILE"
 
 echo -e "  ${ORANGE}→${RESET} Installation de l'extension via Blueprint..."
@@ -106,30 +106,71 @@ echo -e "  ${ORANGE}→${RESET} Téléchargement des fichiers..."
 echo ""
 
 FILES=(
+    # Config
     "tailwind.config.js"
+
+    # Lib partagée (hook thème light/dark)
+    "resources/scripts/lib/useTheme.ts"
+
+    # Auth
     "resources/scripts/components/auth/LoginContainer.tsx"
     "resources/scripts/components/auth/LoginFormContainer.tsx"
     "resources/scripts/components/auth/ForgotPasswordContainer.tsx"
+
+    # Navigation
+    "resources/scripts/components/NavigationBar.tsx"
+
+    # Éléments UI
     "resources/scripts/components/elements/Button.tsx"
+    "resources/scripts/components/elements/Code.tsx"
     "resources/scripts/components/elements/ContentBox.tsx"
     "resources/scripts/components/elements/CodemirrorEditor.tsx"
     "resources/scripts/components/elements/GreyRowBox.tsx"
+    "resources/scripts/components/elements/Input.tsx"
+    "resources/scripts/components/elements/Modal.tsx"
     "resources/scripts/components/elements/PageContentBlock.tsx"
+    "resources/scripts/components/elements/Select.tsx"
+    "resources/scripts/components/elements/SubNavigation.tsx"
     "resources/scripts/components/elements/TitledGreyBox.tsx"
     "resources/scripts/components/elements/button/style.module.css"
+
+    # Console & graphiques
     "resources/scripts/components/server/console/chart.ts"
     "resources/scripts/components/server/console/ChartBlock.tsx"
     "resources/scripts/components/server/console/Console.tsx"
     "resources/scripts/components/server/console/ServerConsoleContainer.tsx"
     "resources/scripts/components/server/console/ServerDetailsBlock.tsx"
     "resources/scripts/components/server/console/StatGraphs.tsx"
+
+    # Fichiers
     "resources/scripts/components/server/files/FileManagerContainer.tsx"
     "resources/scripts/components/server/files/FileObjectRow.tsx"
     "resources/scripts/components/server/files/style.module.css"
+
+    # Réseau
     "resources/scripts/components/server/network/AllocationRow.tsx"
+
+    # Démarrage
     "resources/scripts/components/server/startup/StartupContainer.tsx"
+    "resources/scripts/components/server/startup/VariableBox.tsx"
+
+    # Paramètres
+    "resources/scripts/components/server/settings/SettingsContainer.tsx"
+
+    # Planificateurs
+    "resources/scripts/components/server/schedules/ScheduleEditContainer.tsx"
+    "resources/scripts/components/server/schedules/EditScheduleModal.tsx"
+
+    # Sauvegardes
+    "resources/scripts/components/server/backups/CreateBackupButton.tsx"
+
+    # Dashboard / compte
     "resources/scripts/components/dashboard/AccountApiContainer.tsx"
+    "resources/scripts/components/dashboard/ApiKeyModal.tsx"
+    "resources/scripts/components/dashboard/search/SearchModal.tsx"
     "resources/scripts/components/dashboard/ssh/AccountSSHContainer.tsx"
+
+    # Blueprint extensions
     "resources/scripts/blueprint/extensions/blochost/Sidebar.tsx"
     "resources/scripts/blueprint/extensions/blochost/ServerInfoBar.tsx"
     "resources/scripts/blueprint/extensions/blochost/ServerRightPanel.tsx"
@@ -178,8 +219,8 @@ php artisan optimize:clear
 chown -R www-data:www-data "$PTERO/public" "$PTERO/storage" 2>/dev/null || true
 
 echo ""
-echo -e "${GREEN}${BOLD}✅ Thème BLOCHOST v1.1 installé avec succès !${RESET}"
+echo -e "${GREEN}${BOLD}✅ Thème BLOCHOST v1.2 installé avec succès !${RESET}"
 echo ""
 echo -e "  ${ORANGE}Blueprint :${RESET} $(blueprint -v 2>/dev/null || echo 'ok')"
-echo -e "  ${ORANGE}Thème    :${RESET} v1.1 — dark/orange | sidebar animée | graphiques gradient"
+echo -e "  ${ORANGE}Thème    :${RESET} v1.2 — dark/light mode | sidebar | graphiques gradient | mode clair complet"
 echo ""

@@ -55,14 +55,14 @@ const FileObjectRow = ({ file }: { file: FileObject }) => (
                     <FontAwesomeIcon icon={faFolder} style={{ color: '#FF7D20' }} />
                 )}
             </div>
-            <div css={tw`flex-1 truncate`} style={{ color: '#d0d0d0', fontSize: '0.84rem' }}>{file.name}</div>
+            <div css={tw`flex-1 truncate`} style={{ color: 'var(--bh-file-name)', fontSize: '0.84rem', transition: 'color 0.3s' }}>{file.name}</div>
             {file.isFile && (
-                <div css={tw`w-1/6 text-right mr-4 hidden sm:block`} style={{ color: '#555', fontSize: '0.76rem' }}>
+                <div css={tw`w-1/6 text-right mr-4 hidden sm:block`} style={{ color: 'var(--bh-file-meta)', fontSize: '0.76rem', transition: 'color 0.3s' }}>
                     {bytesToString(file.size)}
                 </div>
             )}
             <div css={tw`w-1/5 text-right mr-4 hidden md:block`} title={file.modifiedAt.toString()}
-                style={{ color: '#555', fontSize: '0.76rem' }}>
+                style={{ color: 'var(--bh-file-meta)', fontSize: '0.76rem', transition: 'color 0.3s' }}>
                 {Math.abs(differenceInHours(file.modifiedAt, new Date())) > 48
                     ? format(file.modifiedAt, 'MMM do, yyyy h:mma')
                     : formatDistanceToNow(file.modifiedAt, { addSuffix: true })}

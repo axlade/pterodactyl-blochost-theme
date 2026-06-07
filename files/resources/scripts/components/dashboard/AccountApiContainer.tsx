@@ -82,7 +82,7 @@ export default () => {
                                     </p>
                                 </div>
                                 <p css={tw`text-sm ml-4 hidden md:block`}>
-                                    <code css={tw`font-mono py-1 px-2 rounded`} style={{ background: '#111111', color: '#d0d0d0', border: '1px solid rgba(255,255,255,0.06)' }}>{key.identifier}</code>
+                                    <code className={'font-mono py-1 px-2 rounded'} style={{ background: 'var(--bh-surface2)', color: 'var(--bh-text)', border: '1px solid var(--bh-border)', transition: 'background 0.3s, color 0.3s' }}>{key.identifier}</code>
                                 </p>
                                 <button css={tw`ml-4 p-2 text-sm`} onClick={() => setDeleteIdentifier(key.identifier)}>
                                     <FontAwesomeIcon

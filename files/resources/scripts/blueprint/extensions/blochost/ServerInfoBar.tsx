@@ -12,13 +12,14 @@ import {
     faMicrochip, faMemory, faHdd, faArrowDown, faArrowUp,
     faPlay, faRedo, faStop,
 } from '@fortawesome/free-solid-svg-icons';
+import { useTheme, T } from '@/lib/useTheme';
 
 type Stats = { memory: number; cpu: number; disk: number; uptime: number; rx: number; tx: number };
 const F = "'Sora', sans-serif";
 
 /* ── Icon stat chip ──────────────────────────────────────────── */
 const StatChip = ({
-    label, value, maxValue, color, iconBg, icon, progress,
+    label, value, maxValue, color, iconBg, icon, progress, tk,
 }: {
     label: string;
     value: React.ReactNode;
@@ -27,13 +28,15 @@ const StatChip = ({
     iconBg: string;
     icon: any;
     progress?: number;
+    tk: typeof T['dark'];
 }) => (
     <div style={{
         display: 'flex', alignItems: 'center', gap: '0.5rem',
-        background: 'rgba(255,255,255,0.04)',
-        border: '1px solid rgba(255,255,255,0.07)',
+        background: tk.chipBg,
+        border: `1px solid ${tk.chipBorder}`,
         borderRadius: '10px', padding: '0.45rem 0.7rem',
         flexShrink: 0, fontFamily: F, minWidth: '90px',
+        transition: 'background 0.3s, border-color 0.3s',
     }}>
         <div style={{
             width: '30px', height: '30px', borderRadius: '8px',
@@ -44,8 +47,9 @@ const StatChip = ({
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{
-                fontSize: '0.58rem', fontWeight: 700, color: 'rgba(255,255,255,0.28)',
+                fontSize: '0.58rem', fontWeight: 700, color: tk.chipLabel,
                 textTransform: 'uppercase', letterSpacing: '0.08em', whiteSpace: 'nowrap',
+                transition: 'color 0.3s',
             }}>{label}</div>
             <div style={{
                 fontSize: '0.82rem', fontWeight: 600, color, lineHeight: 1.2,
@@ -53,7 +57,7 @@ const StatChip = ({
             }}>
                 {value}
                 {maxValue !== undefined && (
-                    <span style={{ fontSize: '0.63rem', color: 'rgba(255,255,255,0.25)', fontWeight: 400 }}>
+                    <span style={{ fontSize: '0.63rem', color: tk.maxValueColor, fontWeight: 400 }}>
                         {' /'}{maxValue}
                     </span>
                 )}
@@ -61,7 +65,7 @@ const StatChip = ({
             {progress !== undefined && (
                 <div style={{
                     marginTop: '3px', height: '2px',
-                    background: 'rgba(255,255,255,0.08)', borderRadius: '2px', overflow: 'hidden',
+                    background: tk.progressTrack, borderRadius: '2px', overflow: 'hidden',
                 }}>
                     <div style={{
                         height: '100%', width: `${Math.min(100, Math.max(0, progress))}%`,
@@ -74,15 +78,16 @@ const StatChip = ({
 );
 
 /* ── Status + Uptime chip ────────────────────────────────────── */
-const StatusChip = ({ status, uptime }: { status: string | null; uptime: number }) => {
+const StatusChip = ({ status, uptime, tk }: { status: string | null; uptime: number; tk: typeof T['dark'] }) => {
     const color = status === 'running' ? '#22c55e' : status === 'offline' ? '#ef4444' : '#eab308';
     return (
         <div style={{
             display: 'flex', alignItems: 'center', gap: '0.6rem',
-            background: 'rgba(255,255,255,0.04)',
-            border: '1px solid rgba(255,255,255,0.07)',
+            background: tk.chipBg,
+            border: `1px solid ${tk.chipBorder}`,
             borderRadius: '10px', padding: '0.45rem 0.7rem',
             flexShrink: 0, fontFamily: F,
+            transition: 'background 0.3s, border-color 0.3s',
         }}>
             <span style={{
                 width: '8px', height: '8px', borderRadius: '50%',
@@ -91,22 +96,22 @@ const StatusChip = ({ status, uptime }: { status: string | null; uptime: number 
             }} />
             <div>
                 <div style={{
-                    fontSize: '0.58rem', fontWeight: 700, color: 'rgba(255,255,255,0.28)',
-                    textTransform: 'uppercase', letterSpacing: '0.08em',
+                    fontSize: '0.58rem', fontWeight: 700, color: tk.chipLabel,
+                    textTransform: 'uppercase', letterSpacing: '0.08em', transition: 'color 0.3s',
                 }}>Statut</div>
-                <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#e0e0e0', lineHeight: 1.2 }}>
+                <div style={{ fontSize: '0.82rem', fontWeight: 600, color: tk.chipValue, lineHeight: 1.2, transition: 'color 0.3s' }}>
                     {capitalize(status || 'offline')}
                 </div>
             </div>
             {uptime > 0 && (
                 <>
-                    <div style={{ width: '1px', alignSelf: 'stretch', background: 'rgba(255,255,255,0.07)' }} />
+                    <div style={{ width: '1px', alignSelf: 'stretch', background: tk.chipDivider }} />
                     <div>
                         <div style={{
-                            fontSize: '0.58rem', fontWeight: 700, color: 'rgba(255,255,255,0.28)',
-                            textTransform: 'uppercase', letterSpacing: '0.08em',
+                            fontSize: '0.58rem', fontWeight: 700, color: tk.chipLabel,
+                            textTransform: 'uppercase', letterSpacing: '0.08em', transition: 'color 0.3s',
                         }}>Uptime</div>
-                        <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#e0e0e0', lineHeight: 1.2 }}>
+                        <div style={{ fontSize: '0.82rem', fontWeight: 600, color: tk.chipValue, lineHeight: 1.2, transition: 'color 0.3s' }}>
                             <UptimeDuration uptime={uptime / 1000} />
                         </div>
                     </div>
@@ -117,13 +122,14 @@ const StatusChip = ({ status, uptime }: { status: string | null; uptime: number 
 };
 
 /* ── Network chip ────────────────────────────────────────────── */
-const NetworkChip = ({ rx, tx, offline }: { rx: number; tx: number; offline: boolean }) => (
+const NetworkChip = ({ rx, tx, offline, tk }: { rx: number; tx: number; offline: boolean; tk: typeof T['dark'] }) => (
     <div style={{
         display: 'flex', alignItems: 'center', gap: '0.55rem',
-        background: 'rgba(255,255,255,0.04)',
-        border: '1px solid rgba(255,255,255,0.07)',
+        background: tk.chipBg,
+        border: `1px solid ${tk.chipBorder}`,
         borderRadius: '10px', padding: '0.45rem 0.7rem',
         flexShrink: 0, fontFamily: F,
+        transition: 'background 0.3s, border-color 0.3s',
     }}>
         <div style={{
             width: '30px', height: '30px', borderRadius: '8px',
@@ -134,14 +140,14 @@ const NetworkChip = ({ rx, tx, offline }: { rx: number; tx: number; offline: boo
         </div>
         <div>
             <div style={{
-                fontSize: '0.58rem', fontWeight: 700, color: 'rgba(255,255,255,0.28)',
-                textTransform: 'uppercase', letterSpacing: '0.08em',
+                fontSize: '0.58rem', fontWeight: 700, color: tk.chipLabel,
+                textTransform: 'uppercase', letterSpacing: '0.08em', transition: 'color 0.3s',
             }}>Entrant</div>
             <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#22d3ee', lineHeight: 1.2 }}>
                 {offline ? '—' : bytesToString(rx)}
             </div>
         </div>
-        <div style={{ width: '1px', alignSelf: 'stretch', background: 'rgba(255,255,255,0.07)' }} />
+        <div style={{ width: '1px', alignSelf: 'stretch', background: tk.chipDivider }} />
         <div style={{
             width: '30px', height: '30px', borderRadius: '8px',
             background: 'rgba(250,204,21,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -151,8 +157,8 @@ const NetworkChip = ({ rx, tx, offline }: { rx: number; tx: number; offline: boo
         </div>
         <div>
             <div style={{
-                fontSize: '0.58rem', fontWeight: 700, color: 'rgba(255,255,255,0.28)',
-                textTransform: 'uppercase', letterSpacing: '0.08em',
+                fontSize: '0.58rem', fontWeight: 700, color: tk.chipLabel,
+                textTransform: 'uppercase', letterSpacing: '0.08em', transition: 'color 0.3s',
             }}>Sortant</div>
             <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#facc15', lineHeight: 1.2 }}>
                 {offline ? '—' : bytesToString(tx)}
@@ -163,20 +169,20 @@ const NetworkChip = ({ rx, tx, offline }: { rx: number; tx: number; offline: boo
 
 /* ── Power button ────────────────────────────────────────────── */
 const PowerBtn = ({
-    label, color, disabled, onClick, icon,
+    label, color, disabled, onClick, icon, tk,
 }: {
-    label: string; color: string; disabled?: boolean; onClick(): void; icon: any;
+    label: string; color: string; disabled?: boolean; onClick(): void; icon: any; tk: typeof T['dark'];
 }) => (
     <button disabled={disabled} onClick={onClick} style={{
         display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
-        background: disabled ? 'rgba(255,255,255,0.04)' : `${color}20`,
-        border: `1px solid ${disabled ? 'rgba(255,255,255,0.07)' : color + '55'}`,
+        background: disabled ? tk.powerDisabledBg : `${color}20`,
+        border: `1px solid ${disabled ? tk.powerDisabledBorder : color + '55'}`,
         borderRadius: '8px',
-        color: disabled ? 'rgba(255,255,255,0.2)' : color,
+        color: disabled ? tk.powerDisabledColor : color,
         fontFamily: F, fontWeight: 600, fontSize: '0.75rem',
         padding: '0.3rem 0.7rem',
         cursor: disabled ? 'not-allowed' : 'pointer',
-        transition: 'background .15s, opacity .15s',
+        transition: 'background .15s, border-color .15s, color .15s',
         flexShrink: 0, whiteSpace: 'nowrap',
     }}>
         <FontAwesomeIcon icon={icon} style={{ fontSize: '0.65rem' }} />
@@ -184,31 +190,13 @@ const PowerBtn = ({
     </button>
 );
 
-/* ── Grass-block server icon ─────────────────────────────────── */
-const ServerIcon = () => (
-    <div style={{
-        width: '50px', height: '50px', borderRadius: '10px',
-        overflow: 'hidden', flexShrink: 0,
-        border: '1px solid rgba(255,255,255,0.08)',
-        background: '#8b5c2a',
-        position: 'relative',
-    }}>
-        <div style={{
-            position: 'absolute', top: 0, left: 0, right: 0, height: '55%',
-            background: '#5a9e2e',
-        }} />
-        <div style={{
-            position: 'absolute', top: '48%', left: 0, right: 0, height: '8%',
-            background: '#4a8020',
-        }} />
-    </div>
-);
-
 /* ══════════════════════════════════════════════════════════════
    MAIN COMPONENT
    ══════════════════════════════════════════════════════════════ */
 export default () => {
     const [stats, setStats] = useState<Stats>({ memory: 0, cpu: 0, disk: 0, uptime: 0, rx: 0, tx: 0 });
+    const [theme] = useTheme();
+    const tk = T[theme];
 
     const name      = ServerContext.useStoreState((s) => s.server.data!.name);
     const status    = ServerContext.useStoreState((s) => s.status.value);
@@ -256,17 +244,15 @@ export default () => {
                 display: 'flex', alignItems: 'center', gap: '0.75rem',
                 marginBottom: '0.7rem', flexWrap: 'wrap',
             }}>
-
-                <ServerIcon />
-
                 {/* Name + status badge + IP */}
                 <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
                         <h1 style={{
-                            margin: 0, fontSize: '1.25rem', fontWeight: 800, color: '#e8e8e8',
+                            margin: 0, fontSize: '1.25rem', fontWeight: 800, color: tk.serverNameColor,
                             overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: F,
+                            transition: 'color 0.3s',
                         }}>
-                            Blochost
+                            {name}
                         </h1>
                         <span style={{
                             display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
@@ -286,11 +272,11 @@ export default () => {
                             display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
                             marginTop: '3px', cursor: 'pointer',
                         }}>
-                            <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.28)', fontFamily: F }}>
+                            <span style={{ fontSize: '0.75rem', color: tk.ipColor, fontFamily: F, transition: 'color 0.3s' }}>
                                 {allocation}
                             </span>
                             <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
-                                stroke="rgba(255,255,255,0.22)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                stroke={tk.ipIconStroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <rect x="9" y="9" width="13" height="13" rx="2"/>
                                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
                             </svg>
@@ -300,16 +286,16 @@ export default () => {
 
                 {/* Power buttons */}
                 <div style={{ display: 'flex', gap: '0.35rem', flexShrink: 0, alignItems: 'center' }}>
-                    {canStart   && <PowerBtn label='Démarrer'  color='#16a34a' disabled={!isOffline}  onClick={() => send('start')}   icon={faPlay} />}
-                    {canRestart && <PowerBtn label='Relancer'  color='#374151' disabled={!status}      onClick={() => send('restart')} icon={faRedo} />}
-                    {canStop    && <PowerBtn label={isStopping ? 'Forcer' : 'Arrêter'} color='#dc2626' disabled={isOffline} onClick={() => send(isStopping ? 'kill' : 'stop')} icon={faStop} />}
+                    {canStart   && <PowerBtn label='Démarrer'  color='#16a34a' disabled={!isOffline}  onClick={() => send('start')}   icon={faPlay}  tk={tk} />}
+                    {canRestart && <PowerBtn label='Relancer'  color='#d97706' disabled={!status}      onClick={() => send('restart')} icon={faRedo}  tk={tk} />}
+                    {canStop    && <PowerBtn label={isStopping ? 'Forcer' : 'Arrêter'} color='#dc2626' disabled={isOffline} onClick={() => send(isStopping ? 'kill' : 'stop')} icon={faStop} tk={tk} />}
                 </div>
             </div>
 
             {/* ── Row 2: stat chips ── */}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', alignItems: 'stretch' }}>
 
-                <StatusChip status={status} uptime={stats.uptime} />
+                <StatusChip status={status} uptime={stats.uptime} tk={tk} />
 
                 <StatChip
                     label="CPU"
@@ -319,6 +305,7 @@ export default () => {
                     iconBg="rgba(255,125,32,0.18)"
                     icon={faMicrochip}
                     progress={!isOffline && limits.cpu > 0 ? cpuPct : undefined}
+                    tk={tk}
                 />
 
                 <StatChip
@@ -329,19 +316,21 @@ export default () => {
                     iconBg="rgba(167,139,250,0.18)"
                     icon={faMemory}
                     progress={!isOffline && limits.memory > 0 ? memPct : undefined}
+                    tk={tk}
                 />
 
                 <StatChip
                     label="Disque"
                     value={bytesToString(stats.disk)}
                     maxValue={limits.disk > 0 ? bytesToString(mbToBytes(limits.disk)) : undefined}
-                    color="#d0d0d0"
-                    iconBg="rgba(255,255,255,0.08)"
+                    color={tk.diskColor}
+                    iconBg={tk.diskIconBg}
                     icon={faHdd}
                     progress={limits.disk > 0 ? diskPct : undefined}
+                    tk={tk}
                 />
 
-                <NetworkChip rx={stats.rx} tx={stats.tx} offline={isOffline} />
+                <NetworkChip rx={stats.rx} tx={stats.tx} offline={isOffline} tk={tk} />
 
             </div>
         </div>

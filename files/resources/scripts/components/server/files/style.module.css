@@ -16,11 +16,11 @@
 
 .file_row {
     @apply flex items-center cursor-pointer text-sm no-underline;
-    background: #191919;
+    background: var(--bh-surface);
     transition: background 0.15s;
 
     &:hover {
-        background: #212121;
+        background: var(--bh-file-hover);
         @apply text-neutral-100;
     }
 
@@ -28,7 +28,8 @@
         @apply flex flex-1 items-center no-underline py-3 overflow-hidden truncate;
         padding-left: 0;
         padding-right: 1rem;
-        color: #c0c0c0;
+        color: var(--bh-text);
+        transition: color 0.3s;
 
         &:not(a) {
             @apply cursor-default;
@@ -38,5 +39,5 @@
 
 /* Séparateur uniquement entre deux lignes adjacentes — pas au-dessus de la première */
 .file_row + .file_row {
-    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    border-top: 1px solid var(--bh-border);
 }

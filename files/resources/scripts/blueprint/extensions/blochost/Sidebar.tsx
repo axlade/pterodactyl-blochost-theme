@@ -7,9 +7,10 @@ import {
     faLayerGroup, faUser, faKey, faFingerprint, faShieldAlt, faSignOutAlt,
     faTerminal, faFolder, faDatabase, faClock, faUsers, faDownload,
     faNetworkWired, faRocket, faCogs, faList, faChevronLeft,
-    faChevronDown, faChevronRight,
+    faChevronDown, faChevronRight, faSun, faMoon,
 } from '@fortawesome/free-solid-svg-icons';
 import http from '@/api/http';
+import { useTheme, T } from '@/lib/useTheme';
 
 const F = "'Sora', sans-serif";
 
@@ -37,7 +38,6 @@ const OrangeWrap = ({ children, extraStyle }: {
             onMouseEnter={() => setHov(true)}
             onMouseLeave={() => setHov(false)}
         >
-            {/* Couche orange — cercle qui s'étend */}
             <div style={{
                 position: 'absolute', inset: 0, pointerEvents: 'none',
                 background: '#FF7D20',
@@ -49,10 +49,12 @@ const OrangeWrap = ({ children, extraStyle }: {
     );
 };
 
-/* ── Composant section déroulante ───────────────────────────── */
+/* ── Section déroulante ─────────────────────────────────────── */
 interface SectionProps { title: string; defaultOpen?: boolean; children: React.ReactNode }
 const Section = ({ title, defaultOpen = true, children }: SectionProps) => {
     const [open, setOpen] = useState(defaultOpen);
+    const [theme] = useTheme();
+    const t = T[theme];
     return (
         <div style={{ marginTop: '0.1rem' }}>
             <button onClick={() => setOpen(o => !o)} style={{
@@ -60,10 +62,10 @@ const Section = ({ title, defaultOpen = true, children }: SectionProps) => {
                 width: '100%', background: 'none', border: 'none', cursor: 'pointer',
                 padding: '0.4rem 0.5rem', borderRadius: '8px', fontFamily: F,
             }}>
-                <span style={{ fontSize: '0.58rem', fontWeight: 700, color: '#282828', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                <span style={{ fontSize: '0.58rem', fontWeight: 700, color: t.sectionLabel, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
                     {title}
                 </span>
-                <FontAwesomeIcon icon={open ? faChevronDown : faChevronRight} style={{ fontSize: '0.55rem', color: '#2a2a2a' }} />
+                <FontAwesomeIcon icon={open ? faChevronDown : faChevronRight} style={{ fontSize: '0.55rem', color: t.sectionChevron }} />
             </button>
             {open && <div style={{ paddingLeft: '0.15rem' }}>{children}</div>}
         </div>
@@ -105,6 +107,8 @@ export default () => {
     const email     = useStoreState((s: ApplicationStore) => s.user.data!.email);
     const isAdmin   = useStoreState((s: ApplicationStore) => s.user.data!.rootAdmin);
     const [loggingOut, setLoggingOut] = useState(false);
+    const [theme, toggleTheme] = useTheme();
+    const t = T[theme];
 
     const { pathname } = useLocation();
     const serverMatch = matchPath<{ id: string }>(pathname, { path: '/server/:id', exact: false });
@@ -119,19 +123,20 @@ export default () => {
         <div id='bh-sidebar' style={{
             position: 'fixed', left: 0, top: 0,
             width: '220px', height: '100vh',
-            background: '#0f0f0f',
-            borderRight: '1px solid rgba(255,125,32,0.08)',
+            background: t.sidebarBg,
+            borderRight: `1px solid ${t.sidebarBorder}`,
             display: 'flex', flexDirection: 'column', zIndex: 1000,
             fontFamily: F,
+            transition: 'background 0.3s, border-color 0.3s',
         }}>
             {/* ── Brand ── */}
-            <div style={{ padding: '1.25rem 1rem 1rem', borderBottom: '1px solid rgba(255,255,255,0.04)', flexShrink: 0 }}>
+            <div style={{ padding: '1.25rem 1rem 1rem', borderBottom: `1px solid ${t.sidebarTopBorder}`, flexShrink: 0 }}>
                 <Link to='/' style={{ textDecoration: 'none' }}>
                     <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#FF7D20', letterSpacing: '-0.04em', fontFamily: F }}>
                         {panelName}
                     </div>
                 </Link>
-                <div style={{ fontSize: '0.62rem', color: '#222', marginTop: '0.18rem', fontWeight: 500, fontFamily: F }}>
+                <div style={{ fontSize: '0.62rem', color: t.subtitleColor, marginTop: '0.18rem', fontWeight: 500, fontFamily: F }}>
                     Panel de gestion
                 </div>
             </div>
@@ -141,10 +146,9 @@ export default () => {
 
                 {serverId ? (
                     <>
-                        {/* Bouton retour */}
                         <OrangeWrap extraStyle={{ marginTop: '0.3rem', marginBottom: '0.2rem' }}>
                             {(hov) => (
-                                <Link to='/' className='bh-nav-item' style={{ ...base, color: hov ? '#fff' : '#333', fontSize: '0.75rem' }}>
+                                <Link to='/' className='bh-nav-item' style={{ ...base, color: hov ? '#fff' : t.navColor, fontSize: '0.75rem' }}>
                                     <FontAwesomeIcon icon={faChevronLeft} style={{ fontSize: '0.68rem' }} />
                                     Tableau de bord
                                 </Link>
@@ -160,7 +164,7 @@ export default () => {
                                                 exact={item.exact}
                                                 to={`/server/${serverId}${item.sub}`}
                                                 className='bh-nav-item'
-                                                style={{ ...base, color: hov ? '#fff' : '#484848' }}
+                                                style={{ ...base, color: hov ? '#fff' : t.navColor }}
                                                 activeStyle={{ color: hov ? '#fff' : '#FF7D20', fontWeight: 600, background: 'transparent' }}
                                             >
                                                 <FontAwesomeIcon icon={item.icon} fixedWidth style={{ fontSize: '0.79rem' }} />
@@ -177,7 +181,7 @@ export default () => {
                         <OrangeWrap>
                             {(hov) => (
                                 <NavLink exact to='/' className='bh-nav-item'
-                                    style={{ ...base, color: hov ? '#fff' : '#484848' }}
+                                    style={{ ...base, color: hov ? '#fff' : t.navColor }}
                                     activeStyle={{ color: hov ? '#fff' : '#FF7D20', fontWeight: 600, background: 'transparent' }}
                                 >
                                     <FontAwesomeIcon icon={faLayerGroup} fixedWidth style={{ fontSize: '0.79rem' }} />
@@ -198,7 +202,7 @@ export default () => {
                         <OrangeWrap key={to}>
                             {(hov) => (
                                 <NavLink exact={exact} to={to} className='bh-nav-item'
-                                    style={{ ...base, color: hov ? '#fff' : '#484848' }}
+                                    style={{ ...base, color: hov ? '#fff' : t.navColor }}
                                     activeStyle={{ color: hov ? '#fff' : '#FF7D20', fontWeight: 600, background: 'transparent' }}
                                 >
                                     <FontAwesomeIcon icon={icon} fixedWidth style={{ fontSize: '0.79rem' }} />
@@ -213,7 +217,7 @@ export default () => {
                     <Section title='Administration' defaultOpen={false}>
                         <OrangeWrap>
                             {(hov) => (
-                                <a href='/admin' className='bh-nav-item' style={{ ...base, color: hov ? '#fff' : '#484848' }}>
+                                <a href='/admin' className='bh-nav-item' style={{ ...base, color: hov ? '#fff' : t.navColor }}>
                                     <FontAwesomeIcon icon={faShieldAlt} fixedWidth style={{ fontSize: '0.79rem' }} />
                                     Admin panel
                                 </a>
@@ -224,11 +228,11 @@ export default () => {
             </nav>
 
             {/* ── User footer ── */}
-            <div style={{ padding: '0.55rem', borderTop: '1px solid rgba(255,255,255,0.04)', flexShrink: 0 }}>
+            <div style={{ padding: '0.55rem', borderTop: `1px solid ${t.sidebarTopBorder}`, flexShrink: 0 }}>
                 <div style={{
                     display: 'flex', alignItems: 'center', gap: '0.5rem',
                     padding: '0.5rem 0.55rem', borderRadius: '11px',
-                    background: 'rgba(255,255,255,0.025)',
+                    background: t.userFooterBg,
                 }}>
                     <div style={{
                         width: '30px', height: '30px', flexShrink: 0, borderRadius: '8px',
@@ -239,15 +243,25 @@ export default () => {
                         {username.charAt(0).toUpperCase()}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: '0.76rem', fontWeight: 600, color: '#b8b8b8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: F }}>
+                        <div style={{ fontSize: '0.76rem', fontWeight: 600, color: t.usernameColor, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: F }}>
                             {username}
                         </div>
-                        <div style={{ fontSize: '0.61rem', color: '#2c2c2c', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: F }}>
+                        <div style={{ fontSize: '0.61rem', color: t.roleColor, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: F }}>
                             {isAdmin ? 'Administrateur' : email}
                         </div>
                     </div>
+
+                    {/* Theme toggle */}
+                    <button onClick={toggleTheme} style={{
+                        background: 'none', border: 'none', cursor: 'pointer',
+                        color: t.logoutColor, padding: '4px 5px', borderRadius: '6px',
+                        flexShrink: 0, transition: 'color 0.15s',
+                    }} title={theme === 'dark' ? 'Mode clair' : 'Mode sombre'}>
+                        <FontAwesomeIcon icon={theme === 'dark' ? faSun : faMoon} />
+                    </button>
+
                     <button onClick={logout} disabled={loggingOut} className='bh-logout-btn'
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#2a2a2a', padding: '4px 5px', borderRadius: '6px', flexShrink: 0, transition: 'color 0.15s' }}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: t.logoutColor, padding: '4px 5px', borderRadius: '6px', flexShrink: 0, transition: 'color 0.15s' }}
                         title='Déconnexion'>
                         <FontAwesomeIcon icon={faSignOutAlt} />
                     </button>
