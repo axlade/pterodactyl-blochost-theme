@@ -218,6 +218,7 @@ FILES=(
     "resources/scripts/components/server/backups/CreateBackupButton.tsx"
 
     # Dashboard / compte
+    "resources/scripts/components/dashboard/ServerRow.tsx"
     "resources/scripts/components/dashboard/AccountApiContainer.tsx"
     "resources/scripts/components/dashboard/ApiKeyModal.tsx"
     "resources/scripts/components/dashboard/search/SearchModal.tsx"
@@ -229,6 +230,9 @@ FILES=(
     "resources/scripts/blueprint/extensions/blochost/ServerRightPanel.tsx"
     "resources/scripts/blueprint/extensions/blochost/HeroBanner.tsx"
     "resources/scripts/blueprint/extensions/blochost/Components.yml"
+
+    # CSS variables dark/light (critique — doit être après blueprint -install)
+    ".blueprint/extensions/blochost/dashboard.css"
 )
 
 TOTAL=${#FILES[@]}
