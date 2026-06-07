@@ -137,7 +137,8 @@ echo ""
 echo -e "${ORANGE}${BOLD}[ 2/4 ] Extension Blueprint blochost${RESET}"
 
 # Supprimer le lockfile Blueprint (résidu d'une install précédente)
-rm -f "$PTERO/.blueprint/.lock" 2>/dev/null || true
+# Le fichier s'appelle "lock" (sans point) dans .blueprint/
+rm -f "$PTERO/.blueprint/lock" 2>/dev/null || true
 
 BLUEPRINT_FILE="$PTERO/blochost.blueprint"
 echo -e "  ${ORANGE}→${RESET} Téléchargement de blochost.blueprint v1.2..."
