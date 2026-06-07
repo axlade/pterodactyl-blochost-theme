@@ -62,7 +62,7 @@ else
     echo -e "  ${ORANGE}→${RESET} Téléchargement de Blueprint..."
     cd "$PTERO"
 
-    BP_ZIP_URL="https://github.com/blueprintframework/blueprint/releases/latest/download/blueprint.zip"
+    BP_ZIP_URL="https://github.com/BlueprintFramework/framework/releases/latest/download/release.zip"
     curl -fsSL "$BP_ZIP_URL" -o blueprint.zip
     unzip -o blueprint.zip -d . > /dev/null
     rm -f blueprint.zip
